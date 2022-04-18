@@ -1,0 +1,1 @@
+        $column_{FIELD_NAME}->setAction(new TAction([$this, 'onReload']), ['order' => '{FIELD_NAME}']);

@@ -1,0 +1,130 @@
+#!/bin/bash
+# ==============================================================================
+#
+# Author: Marcelo Barreto Nees <marcelo.linux@gmail.com>
+#
+# ==============================================================================
+
+
+adicli_help() {
+  echo
+  echo "Use: $0 -c /etc/adicli/databases/database.conf -t table -T template -C class"
+  #echo "e.g.: $0 -c /etc/adicli/databases/database.conf -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php -C CustomersForm"
+  echo
+
+cat <<EOF
+  db..........: $db
+  db_engine...: $db_engine
+  db_host.....: $db_host
+  db_port.....: $db_port
+  db_admin....: $db_admin
+  db_password.: $db_password
+  db_table....: $db_table
+  template....: $TEMPLATE
+  class.......: $CLASS
+  option......: $option
+EOF
+
+  echo
+  echo "Templates:"
+  echo "=========="
+  cd /usr/share/adicli/framework/templates/
+  find /usr/share/adicli/framework/templates|grep .php$
+  echo
+  exit 1
+
+}
+
+
+#while getopts :c:d:e:h:a:p:P:t: opt "${MY_OWN_SET[@]}"; do
+while getopts :c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
+  case $opt in
+    c)
+      conf_file=$OPTARG
+      DATABASE=$(basename $conf_file|sed -e 's/.conf$//g')
+      ;;
+    #d)
+    #  db=$OPTARG
+    #  ;;
+    #e)
+    #  db_engine=$OPTARG
+    #  ;;
+    #h)
+    #  db_host=$OPTARG
+    #  ;;
+    #a)
+    #  db_admin=$OPTARG
+    #  ;;
+    #p)
+    #  db_password=$OPTARG
+    #  ;;
+    #P)
+    #  db_port=$OPTARG
+    #  ;;
+    T)
+      TEMPLATE=$OPTARG
+      ;;
+    C)
+      CLASS=$OPTARG
+      ;;
+    O)
+      option=$(echo $OPTARG|tr 'A-Z' 'a-z')
+      case $option in
+        list)
+        ;;
+        *)
+          echo "$0: Error - Invalid option ($OPTARG)"
+          exit 3
+        ;;
+      esac
+      ;;
+    t)
+      db_table=$OPTARG
+      ACTIVE_RECORD=$db_table
+      TABLENAME=$db_table
+
+      #db_table_class=$(echo $db_table|tr 'A-Z' 'a-z'|sed -r 's/\b[a-z]+/\u&/g')
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+
+done
+
+
+if [ -z $conf_file ] || [ ! -f $conf_file ]; then
+
+  echo "$0: Error - Invalid database config file"
+  #exit 2
+
+else
+
+  source $conf_file
+
+fi
+
+
+# List tables
+# ==============================================================================
+if [ "X$option" == "Xlist" ] ; then
+
+  echo
+
+else
+
+  # Verifica se todos os parametros foram passados
+
+  if [ -z $db ] || [ -z $db_host ] || [ -z $db_engine ] || [ -z $db_port ]  || [ -z $db_admin ] || [ -z $db_password ] || [ -z $db_table ] || [ -z $TEMPLATE ] || [ -z $CLASS ] ; then
+
+    adicli_help
+
+  fi
+
+fi
+

@@ -1,0 +1,1 @@
+            $this->detail_list->addColumn( new TDataGridColumn('{FIELD_NAME}', '{FIELD_LABEL}', 'left') );

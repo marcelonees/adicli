@@ -1,0 +1,1 @@
+        $datagrid->addColumn( new TDataGridColumn('{FIELD_NAME}',  '{FIELD_LABEL}',  '{FIELD_ALIGN}') );
