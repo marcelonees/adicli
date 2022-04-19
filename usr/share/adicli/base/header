@@ -9,7 +9,6 @@
 adicli_help() {
   echo
   echo "Use: $0 -c /etc/adicli/databases/database.conf -t table -T template -C class"
-  #echo "e.g.: $0 -c /etc/adicli/databases/database.conf -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php -C CustomersForm"
   echo
 
 cat <<EOF
