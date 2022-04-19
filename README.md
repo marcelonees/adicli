@@ -96,7 +96,7 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 <!---Se o seu README for longo ou se você tiver algum processo ou etapas específicas que deseja que os contribuidores sigam, considere a criação de um arquivo CONTRIBUTING.md separado--->
 Para contribuir com adicli, siga estas etapas:
 
-1. Bifurque este repositório.
+1. Faça um fork deste repositório.
 2. Crie um branch: `git checkout -b <nome_branch>`.
 3. Faça suas alterações e confirme-as: `git commit -m '<mensagem_commit>'`
 4. Envie para o branch original: `git push origin <nome_do_projeto> / <local>`
