@@ -20,12 +20,12 @@ cat <<EOF
   db_port.....: $db_port
   db_admin....: $db_admin
   db_password.: $db_password
-  db_table....: $db_table
-  Template....: $TEMPLATE
-  Class.......: $CLASS
 
   Optional:
   =============================
+  db_table....: $db_table
+  Template....: $TEMPLATE
+  Class.......: $CLASS  
   Author......: $AUTHOR
   Parent Class: $PARENT_CLASS
   Option......: $option
@@ -35,7 +35,7 @@ EOF
   echo
   echo "Templates:"
   echo "=========="
-  cd /usr/share/adicli/framework/templates/
+  cd /usr/share/adicli/framework/templates/ || exit
   find /usr/share/adicli/framework/templates|grep .php$
   echo
   exit 1
@@ -59,7 +59,8 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       ;;
     c)
       conf_file=$OPTARG
-      DATABASE=$(basename $conf_file|sed -e 's/.conf$//g')
+      DATABASE=$(basename "$conf_file"|sed -e 's/.conf$//g')
+      export DATABASE
       ;;
     T)
       TEMPLATE=$OPTARG
@@ -68,7 +69,7 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       CLASS=$OPTARG
       ;;
     O)
-      option=$(echo $OPTARG|tr 'A-Z' 'a-z')
+      option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
         list)
         ;;
@@ -79,9 +80,11 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       esac
       ;;
     t)
-      db_table=$OPTARG
+      db_table="$OPTARG"
       ACTIVE_RECORD=$db_table
       TABLENAME=$db_table
+      export ACTIVE_RECORD
+      export TABLENAME
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -96,14 +99,14 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
 done
 
 
-if [ -z $conf_file ] || [ ! -f $conf_file ]; then
+if [ -z "$conf_file" ] || [ ! -f "$conf_file" ]; then
 
   echo "$0: Error - Invalid database config file"
   #exit 2
 
 else
 
-  source $conf_file
+  source "$conf_file"
 
 fi
 
@@ -118,7 +121,7 @@ else
 
   # Verifica se todos os parametros foram passados
 
-  if [ -z $db ] || [ -z $db_host ] || [ -z $db_engine ] || [ -z $db_port ]  || [ -z $db_admin ] || [ -z $db_password ] || [ -z $db_table ] || [ -z $TEMPLATE ] || [ -z $CLASS ] ; then
+  if [ -z "$db" ] || [ -z "$db_host" ] || [ -z "$db_engine" ] || [ -z "$db_port" ]  || [ -z "$db_admin" ] || [ -z "$db_password" ] || [ -z "$db_table" ] || [ -z "$TEMPLATE" ] || [ -z "$CLASS" ] ; then
 
     adicli_help
 

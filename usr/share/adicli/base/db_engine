@@ -51,7 +51,7 @@ case $db_engine in
   *)
     echo "$0: Error - Invalid or Unknown database"
     adicli_help
-    exit 999
+    exit 255
     ;;
 
 esac

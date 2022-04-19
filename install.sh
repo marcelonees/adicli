@@ -13,7 +13,7 @@ set -e
 #set -euxo pipefail
 
 # Must be root
-if [ $(whoami) != "root" ] ; then
+if [ "$(whoami)" != "root" ] ; then
   echo "$0: Error - You must be root to install adicli!"
   exit 1
 fi

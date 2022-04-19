@@ -130,7 +130,7 @@ function generate() {
 # DINAMIC_CODE
 # ==============================================================================
 function DINAMIC_CODE() {
-  cat /tmp/adicli/$pid/DINAMIC_CODE.txt
+  cat "/tmp/adicli/$pid/DINAMIC_CODE.txt"
   echo "{NEWLINE}"
 }
 
@@ -139,10 +139,10 @@ function DINAMIC_CODE() {
 # ==============================================================================
 function FORM_FIELDS() {
   echo "{NEWLINE}"
-  cat /tmp/adicli/$pid/FORM_FIELD_Objects.txt; 
+  cat "/tmp/adicli/$pid/FORM_FIELD_Objects.txt"
   echo "{NEWLINE}"
 
-  cat /tmp/adicli/$pid/FORM_FIELDS_Fields.txt; 
+  cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
   echo "{NEWLINE}"
 }
 
@@ -150,14 +150,16 @@ function FORM_FIELDS() {
 # LIST_COLUMNS
 # ==============================================================================
 function LIST_COLUMNS () {
-  cat /tmp/adicli/$pid/FORM_FIELDS_Fields.txt;  echo "{NEWLINE}"
+  cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+  echo "{NEWLINE}"
 }
 
 
 # FILTER_FIELDS
 # ==============================================================================
 function FILTER_FIELDS() {
-  cat /tmp/adicli/$pid/FILTER_FIELDS.txt; echo "{NEWLINE}"
+  cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+  echo "{NEWLINE}"
 }
 
 
@@ -192,11 +194,11 @@ else
     s|^[$]|\n        $|g;
     s|; [$]|;\n        $|g;
     s|parent::|\n    parent::|g;
-  " $TEMPLATE
+  " "$TEMPLATE"
 
 
   # Clean files
   # ==============================================================================
-  rm -rf /tmp/adicli/$pid
+  rm -rf "/tmp/adicli/$pid"
 
 fi
