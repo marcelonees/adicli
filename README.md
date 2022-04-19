@@ -42,7 +42,9 @@ cd adicli
 
 ## ☕ Como usar
 ```
-adicli -c /etc/adicli/databases/database.conf -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php -C CustomersForm"
+adicli  -c /etc/adicli/databases/database.conf \
+        -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php \
+        -C CustomersForm > CustomerForm.class.php"
 ```
 ### Ajustes e melhorias
 
