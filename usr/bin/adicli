@@ -133,7 +133,7 @@ else
 
   sed -e "
 	s|{AUTHOR}|${AUTHOR}|g; 
-        s|{TABLENAME}|${TABLENAME}|g; 
+  s|{TABLENAME}|${TABLENAME}|g; 
 	s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
 	s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
 	s|{STRATEGY}|$STRATEGY|g; 
@@ -149,8 +149,8 @@ else
 	s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
 	s|{NEWLINE}|\n|g;
 	s|<your name here>|${AUTHOR}|g;
-        s|^[$]|\n        $|g
-        s|; [$]|;\n        $|g
+  s|^[$]|\n        $|g
+  s|; [$]|;\n        $|g
 	s|parent::|\n    parent::|g;" $TEMPLATE
 
 
