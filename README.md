@@ -2,9 +2,9 @@
 Adianti CLI (Command Line Interface)
 
 
-![GitHub repo size](https://img.shields.io/github/repo-size/marcelonees/README-template?style=for-the-badge)
-![GitHub language count](https://img.shields.io/github/languages/count/marcelonees/README-template?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/marcelonees/README-template?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/iuricode/README-template?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/iuricode/README-template?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/iuricode/README-template?style=for-the-badge)
 
 A intenção de criar esta ferramenta de linha de comando não é substituir o Adianti Studio, 
 que é uma ferramenta incrível e que aumenta em muito a produtividade.
