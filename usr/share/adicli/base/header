@@ -13,6 +13,8 @@ adicli_help() {
   echo
 
 cat <<EOF
+  Config
+  =============================
   db..........: $db
   db_engine...: $db_engine
   db_host.....: $db_host
@@ -20,9 +22,15 @@ cat <<EOF
   db_admin....: $db_admin
   db_password.: $db_password
   db_table....: $db_table
-  template....: $TEMPLATE
-  class.......: $CLASS
-  option......: $option
+  Template....: $TEMPLATE
+  Class.......: $CLASS
+
+  Optional:
+  =============================
+  Author......: $AUTHOR
+  Parent Class: $PARENT_CLASS
+  Option......: $option
+  Strategy....: $STRATEGY
 EOF
 
   echo
@@ -36,31 +44,24 @@ EOF
 }
 
 
-#while getopts :c:d:e:h:a:p:P:t: opt "${MY_OWN_SET[@]}"; do
-while getopts :c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
+#
+# Parameters
+#
+while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
   case $opt in
+    S)
+      STRATEGY=$OPTARG
+      ;;
+    A)
+      AUTHOR=$OPTARG
+      ;;
+    P)
+      PARENT_CLASS=$OPTARG
+      ;;
     c)
       conf_file=$OPTARG
       DATABASE=$(basename $conf_file|sed -e 's/.conf$//g')
       ;;
-    #d)
-    #  db=$OPTARG
-    #  ;;
-    #e)
-    #  db_engine=$OPTARG
-    #  ;;
-    #h)
-    #  db_host=$OPTARG
-    #  ;;
-    #a)
-    #  db_admin=$OPTARG
-    #  ;;
-    #p)
-    #  db_password=$OPTARG
-    #  ;;
-    #P)
-    #  db_port=$OPTARG
-    #  ;;
     T)
       TEMPLATE=$OPTARG
       ;;
@@ -82,8 +83,6 @@ while getopts :c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       db_table=$OPTARG
       ACTIVE_RECORD=$db_table
       TABLENAME=$db_table
-
-      #db_table_class=$(echo $db_table|tr 'A-Z' 'a-z'|sed -r 's/\b[a-z]+/\u&/g')
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
