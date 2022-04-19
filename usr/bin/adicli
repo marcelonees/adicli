@@ -6,8 +6,6 @@
 #
 # ==============================================================================
 
-#set -euxo pipefail
-
 conf_header=/usr/share/adicli/base/header
 conf_db_engine=/usr/share/adicli/base/db_engine
 
@@ -43,9 +41,6 @@ PARENT_CLASS=${PARENT_CLASS:-TPage}
 
 ##INIT_METHODS##
 ##FORM_SETUP##
-##FORM_FIELDS##
-##FILTER_FIELDS##
-##LIST_COLUMNS##
 
 # ==============================================================================
 # TODO
@@ -118,14 +113,14 @@ function generate() {
         ;;
     esac
   
-    echo "        \$$field = new $type_adianti('$field');"                        			>> /tmp/adicli/$pid/FORM_FIELD_Objects.txt
-    echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			>> /tmp/adicli/$pid/FORM_FIELDS_Fields.txt
-    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		>> /tmp/adicli/$pid/LIST_COLUMNS.txt
+    echo "        \$$field = new $type_adianti('$field');"                        			                >> /tmp/adicli/$pid/FORM_FIELD_Objects.txt
+    echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> /tmp/adicli/$pid/FORM_FIELDS_Fields.txt
+    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> /tmp/adicli/$pid/LIST_COLUMNS.txt
     echo "        \$this->addFilterField('$field', '=', '$field'); // filterField, operator, formField" >> /tmp/adicli/$pid/FILTER_FIELDS.txt
 
     field=$(echo $field|sed -e 's/(.*//g; s/ .*//g')
     if [ "X$field" != "X" ] ; then
-      echo "      parent::addAttribute('$field');"                                			>> /tmp/adicli/$pid/DINAMIC_CODE.txt
+      echo "      parent::addAttribute('$field');"                                			                >> /tmp/adicli/$pid/DINAMIC_CODE.txt
     fi
    
   done
@@ -177,26 +172,27 @@ else
   generate
 
   sed -e "
-	s|{AUTHOR}|${AUTHOR}|g; 
-  s|{TABLENAME}|${TABLENAME}|g; 
-	s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
-	s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
-	s|{STRATEGY}|$STRATEGY|g; 
-	s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
-	s|{CLASS}|$CLASS|g; 
-	s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
-	s|{DATABASE}|$DATABASE|g; 
-	s|{PARENT_CLASS}|$PARENT_CLASS|g; 
-	s|##INIT_METHODS##|$INIT_METHODS|g; 
-	s|##FORM_SETUP##|$FORM_SETUP|g; 
-	s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
-	s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
-	s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
-	s|{NEWLINE}|\n|g;
-	s|<your name here>|${AUTHOR}|g;
-  s|^[$]|\n        $|g
-  s|; [$]|;\n        $|g
-	s|parent::|\n    parent::|g;" $TEMPLATE
+    s|{AUTHOR}|${AUTHOR}|g; 
+    s|{TABLENAME}|${TABLENAME}|g; 
+    s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
+    s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
+    s|{STRATEGY}|$STRATEGY|g; 
+    s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
+    s|{CLASS}|$CLASS|g; 
+    s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
+    s|{DATABASE}|$DATABASE|g; 
+    s|{PARENT_CLASS}|$PARENT_CLASS|g; 
+    s|##INIT_METHODS##|$INIT_METHODS|g; 
+    s|##FORM_SETUP##|$FORM_SETUP|g; 
+    s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
+    s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
+    s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
+    s|{NEWLINE}|\n|g;
+    s|<your name here>|${AUTHOR}|g;
+    s|^[$]|\n        $|g;
+    s|; [$]|;\n        $|g;
+    s|parent::|\n    parent::|g;
+  " $TEMPLATE
 
 
   # Clean files
