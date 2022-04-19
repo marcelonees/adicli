@@ -27,7 +27,14 @@ source $conf_db_engine
 #
 # ==============================================================================
 
-pid=$$
+
+# unix timestamp
+timestamp=$(date +"%s")
+
+# PID
+export pid="${timestamp}.$$"
+
+# Create temporary dir
 mkdir -p /tmp/adicli/$pid
 
 STRATEGY=${STRATEGY:-max}
