@@ -111,7 +111,7 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
 <table>
   <tr>
     <td align="center">
-      <a href="#">
+      <a href="https://github.com/marcelonees">
         <img src="https://avatars3.githubusercontent.com/u/923628?s=100" width="100px;" alt="Marcelo Barreto Nees"/><br>
         <sub>
           <b>Marcelo Barreto Nees</b>
