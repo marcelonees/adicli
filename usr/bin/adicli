@@ -33,11 +33,12 @@ timestamp=$(date +"%s")
 export pid="${timestamp}.$$"
 
 # Create temporary dir
-mkdir -p /tmp/adicli/$pid
+mkdir -p "/tmp/adicli/$pid"
 
 STRATEGY=${STRATEGY:-max}
 AUTHOR=${AUTHOR:-Authors\'s Full Name <mail@domain>}
 PARENT_CLASS=${PARENT_CLASS:-TPage}
+LIMIT=${LIMIT:-10}
 
 ##INIT_METHODS##
 ##FORM_SETUP##
@@ -95,7 +96,7 @@ function list() {
 # Generate Models, Forms, Lists etc..
 # ==============================================================================
 function generate() {
-  echo "$db_command"|$db_connector|egrep -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
+  echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
   
     type=$(echo $type|sed -e 's/(.*//g;')
   
@@ -113,14 +114,14 @@ function generate() {
         ;;
     esac
   
-    echo "        \$$field = new $type_adianti('$field');"                        			                >> /tmp/adicli/$pid/FORM_FIELD_Objects.txt
-    echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> /tmp/adicli/$pid/FORM_FIELDS_Fields.txt
-    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> /tmp/adicli/$pid/LIST_COLUMNS.txt
-    echo "        \$this->addFilterField('$field', '=', '$field'); // filterField, operator, formField" >> /tmp/adicli/$pid/FILTER_FIELDS.txt
+    echo "        \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELD_Objects.txt"
+    echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS.txt"
+    echo "        \$this->addFilterField('$field', '=', '$field'); // filterField, operator, formField" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
-    field=$(echo $field|sed -e 's/(.*//g; s/ .*//g')
+    field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
     if [ "X$field" != "X" ] ; then
-      echo "      parent::addAttribute('$field');"                                			                >> /tmp/adicli/$pid/DINAMIC_CODE.txt
+      echo "      parent::addAttribute('$field');"                                			                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
     fi
    
   done
@@ -194,6 +195,7 @@ else
     s|^[$]|\n        $|g;
     s|; [$]|;\n        $|g;
     s|parent::|\n    parent::|g;
+    s|{LIMIT}|$LIMIT|g;
   " "$TEMPLATE"
 
 

@@ -67,6 +67,7 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       ;;
     C)
       CLASS=$OPTARG
+      ACTIVE_RECORD=$CLASS
       ;;
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
@@ -81,7 +82,6 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
       ;;
     t)
       db_table="$OPTARG"
-      ACTIVE_RECORD=$db_table
       TABLENAME=$db_table
       export ACTIVE_RECORD
       export TABLENAME
