@@ -36,12 +36,13 @@ Mais informações sobre o Framework:
 Logado como usuário root, faça:
 ```
 git clone https://github.com/marcelonees/adicli.git
+cd adicli
 ./install.sh
 ```
 
 ## ☕ Como usar
 ```
-user@host:~$ adicli -c /etc/adicli/databases/database.conf -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php -C CustomersForm"
+adicli -c /etc/adicli/databases/database.conf -t Customers -T /usr/share/adicli/framework/templates/form/StandardForm.php -C CustomersForm"
 ```
 ### Ajustes e melhorias
 
