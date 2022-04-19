@@ -16,3 +16,13 @@ Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
 
 Mais informações sobre o Framework:
 [https://www.adianti.com.br/]
+
+
+Sistemas Operacionais (testados):
+- Debian Gnu/Linux 11 (busseye)
+
+Suporte aos seguintes bancos de dados:
+- PostgreSQL (psql)
+- MySQL (mysql)
+- MariaDB (mysql)
+- Firebird (isql-fb)
