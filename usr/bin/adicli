@@ -196,6 +196,7 @@ else
     s|; [$]|;\n        $|g;
     s|parent::|\n    parent::|g;
     s|{LIMIT}|$LIMIT|g;
+    s|{EDIT_ACTION}|$EDIT_ACTION|g;
   " "$TEMPLATE"
 
 

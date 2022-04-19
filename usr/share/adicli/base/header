@@ -68,6 +68,7 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     C)
       CLASS=$OPTARG
       ACTIVE_RECORD=$CLASS
+      EDIT_ACTION=${CLASS//List/Form}
       ;;
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
