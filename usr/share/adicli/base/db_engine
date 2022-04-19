@@ -28,9 +28,9 @@ case $db_engine in
   #
   "mysql")
     db_command="desc $db_table;"
-    PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g')
-    PRIMARYKEY=$PRIMARY_KEY
     db_connector="mysql -s -h $db_host -P $db_port -u $db_admin -p$db_password $db"
+    PRIMARY_KEY=$(echo "SHOW KEYS FROM $db_table WHERE Key_name = 'PRIMARY';"|$db_connector|grep -i PRIMARY|awk '{print $5}')
+    PRIMARYKEY=$PRIMARY_KEY   
     show_tables="show tables;"
     ;;
 
