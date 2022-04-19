@@ -41,15 +41,53 @@ STRATEGY=${STRATEGY:-max}
 AUTHOR=${AUTHOR:-Authors\'s Full Name <mail@domain>}
 PARENT_CLASS=${PARENT_CLASS:-TPage}
 
-# DATABASE
-# CLASS
-# ACTIVE_RECORD
-
 ##INIT_METHODS##
 ##FORM_SETUP##
 ##FORM_FIELDS##
 ##FILTER_FIELDS##
 ##LIST_COLUMNS##
+
+# ==============================================================================
+# TODO
+# ==============================================================================
+##DATA##
+##DETAIL_FIELD[0]##
+##DETAIL_FIELD[1]##
+##DETAIL_FIELD[2]##
+##DETAIL_FIELD[3]##
+##DETAIL_FIELD[4]##
+##DETAIL_FIELD[5]##
+##DETAIL_FIELD[7]##
+##DETAIL_FIELD[8]##
+##FILTER_FIELDS## <- OK
+##FILTERS##
+##FILTER_SEARCHS##
+##FORM_FIELD[0]##
+##FORM_FIELD[1]##
+##FORM_FIELD[2]##
+##FORM_FIELD[3]##
+##FORM_FIELD[4]##
+##FORM_FIELD[5]##
+##FORM_FIELD[6]##
+##FORM_FIELDS## <- OK
+##FORM_SETUP##
+##INIT_METHODS##
+##LIST_COLUMNS## <- OK
+##MASTER_FIELD[0]##
+##MASTER_FIELD[1]##
+##MASTER_FIELD[2]##
+##METHODS##
+##QUERY_FIELD[0]##
+##QUERY_FIELD[1]##
+##QUERY_FILTER[0]##
+##QUERY_FILTER[1]##
+##QUERY_FILTER[2]##
+##QUERY_FILTER[3]##
+##RESULT_FIELDS##
+##SESSION_FILTERS##
+##STYLES##
+##TITLES##
+# ==============================================================================
 
 
 # List tables

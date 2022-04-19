@@ -2,7 +2,7 @@
 Adianti CLI (Command Line Interface)
 
 A intenção de criar esta ferramenta de linha de comando não é substituir o Adianti Studio, 
-que é uma ferramenta incível e que aumenta em muito a produtividade.
+que é uma ferramenta incrível e que aumenta em muito a produtividade.
 
 Ocorre que esta ferramenta foi descontinuada, em favor do novo Adianti Builder [https://www.adiantibuilder.com.br/].
 
@@ -19,7 +19,7 @@ Mais informações sobre o Framework:
 
 
 Sistemas Operacionais (testados):
-- Debian Gnu/Linux 11 (busseye)
+- Debian Gnu/Linux 11 (bullseye)
 
 Suporte aos seguintes bancos de dados:
 - PostgreSQL (psql)
