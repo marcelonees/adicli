@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ==============================================================================
+#
+# Author: Marcelo Barreto Nees <marcelo.linux@gmail.com>
+#
+# ==============================================================================
 
 # Any subsequent(*) commands which fail will cause the shell script to exit immediately
 set -e
