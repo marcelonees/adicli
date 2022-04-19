@@ -9,7 +9,7 @@ Adianti CLI (Command Line Interface)
 ![GitHub forks](https://img.shields.io/github/forks/iuricode/README-template?style=for-the-badge)
 -->
 
-A intenção de criar esta ferramenta de linha de comando não é substituir o Adianti Studio, 
+A intenção de criar esta ferramenta de linha de comando não é substituir o [Adianti Studio](https://www.adianti.com.br/studio), 
 que é uma ferramenta incrível e que aumenta em muito a produtividade.
 
 Ocorre que esta ferramenta foi descontinuada, em favor do novo [Adianti Builder](https://www.adiantibuilder.com.br).
