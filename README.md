@@ -9,7 +9,7 @@ Adianti CLI (Command Line Interface)
 A intenção de criar esta ferramenta de linha de comando não é substituir o Adianti Studio, 
 que é uma ferramenta incrível e que aumenta em muito a produtividade.
 
-Ocorre que esta ferramenta foi descontinuada, em favor do novo Adianti Builder [https://www.adiantibuilder.com.br/].
+Ocorre que esta ferramenta foi descontinuada, em favor do novo [Adianti Builder] (https://www.adiantibuilder.com.br).
 
 Dessa forma, o adicli pretende ser uma interface rápida para criação de telas baseadas em templates, que podem ser customizados
 para atender necessidades específicas do desenvolvedor.
@@ -19,8 +19,7 @@ Segundo o site do Desenvolvedor do Adianti (Pablo Dall'oglio):
 A missão da Adianti é aumentar a produtividade de sua comunidade.
 Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
 
-Mais informações sobre o Framework:
-[https://www.adianti.com.br/]
+Mais informações sobre o [Framework Adianti] (https://www.adianti.com.br)
 
 
 ## Sistemas Operacionais (testados):
@@ -85,6 +84,36 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 - [ ] ##SESSION_FILTERS##
 - [ ] ##STYLES##
 - [ ] ##TITLES##
+
+
+## 📫 Contribuindo
+<!---Se o seu README for longo ou se você tiver algum processo ou etapas específicas que deseja que os contribuidores sigam, considere a criação de um arquivo CONTRIBUTING.md separado--->
+Para contribuir com adicli, siga estas etapas:
+
+1. Bifurque este repositório.
+2. Crie um branch: `git checkout -b <nome_branch>`.
+3. Faça suas alterações e confirme-as: `git commit -m '<mensagem_commit>'`
+4. Envie para o branch original: `git push origin <nome_do_projeto> / <local>`
+5. Crie a solicitação de pull.
+
+Como alternativa, consulte a documentação do GitHub em [como criar uma solicitação pull](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
+
+## 🤝 Colaboradores 
+
+Agradecemos às seguintes pessoas que contribuíram para este projeto:
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="#">
+        <img src="https://avatars3.githubusercontent.com/u/923628?s=100" width="100px;" alt="Marcelo Barreto Nees"/><br>
+        <sub>
+          <b>Marcelo Barreto Nees</b>
+        </sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## 😄 Seja um dos contribuidores<br>
 
