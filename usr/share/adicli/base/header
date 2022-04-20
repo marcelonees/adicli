@@ -10,7 +10,7 @@
 #
 usage() {
   echo
-  echo "Use: $0 -c database.conf -t Table -T Template -M Model -C ClassName"
+  echo "Use: $0 -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]"
   echo
 }
 
@@ -43,7 +43,7 @@ EOF
 
 
 #
-# Parameters
+# Command Line Options
 #
 while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
   case $opt in
@@ -71,7 +71,7 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
-        "help"|"show tables"|"showtables"|"show templates"|"showtemplates"|"show examples"|"showexamples")
+        "tables"|"templates"|"examples")
         ;;
         *)
           echo "$0: Error - Invalid option ($OPTARG)"
@@ -95,16 +95,20 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
 done
 
 
+# No parameters received
+# ==============================================================================
+if [ "X$1" == "X" ] ; then
 
+  usage
+  exit
 
+fi
 
 # List tables
 # ==============================================================================
 if [ "X$option" != "X" ] ; then
 
-  echo 
-  #usage
-  #exit
+  echo
 
 else
 
@@ -119,8 +123,9 @@ else
 
   fi
 
+  #
   # Verifica se todos os parametros foram passados
-
+  #
   if  [ -z "$db" ]            || \
       [ -z "$db_host" ]       || \
       [ -z "$db_engine" ]     || \
@@ -138,6 +143,10 @@ else
 
 fi
 
+
+#
+# Export some vars
+#
 DATABASE=$(basename "$conf_file"|sed -e 's/.conf$//g')
 EDIT_ACTION=${CLASS//List/Form}
 TABLENAME=$db_table

@@ -248,7 +248,7 @@ function show_templates() {
 function show_examples() {
 cat <<EOF
 How to Use
-================================================================================
+==========
 
 Create a Customers Model
 ========================
@@ -290,19 +290,18 @@ EOF
 
 # List Options or Generate the Class
 # ==============================================================================
-
 case $option in
-  "showtables")
+  "tables")
     show_tables
     exit
     ;;
 
-  "showtemplates")
+  "templates")
     show_templates
     exit
     ;;
 
-  "showexamples")
+  "examples")
     show_examples
     exit
     ;;
