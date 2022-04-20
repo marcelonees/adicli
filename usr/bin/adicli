@@ -151,7 +151,7 @@ function FORM_FIELDS() {
 # LIST_COLUMNS
 # ==============================================================================
 function LIST_COLUMNS () {
-  cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+  cat "/tmp/adicli/$pid/LIST_COLUMNS.txt"
   echo "{NEWLINE}"
 }
 
