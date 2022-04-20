@@ -6,7 +6,7 @@
 # ==============================================================================
 
 
-adicli_help() {
+usage() {
   echo
   echo "Use: $0 -c /etc/adicli/databases/database.conf -t table -T template -C class"
   echo
@@ -73,7 +73,7 @@ while getopts :S:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
-        list)
+        "list"|"show tables")
         ;;
         *)
           echo "$0: Error - Invalid option ($OPTARG)"
@@ -124,9 +124,10 @@ else
 
   if [ -z "$db" ] || [ -z "$db_host" ] || [ -z "$db_engine" ] || [ -z "$db_port" ]  || [ -z "$db_admin" ] || [ -z "$db_password" ] || [ -z "$db_table" ] || [ -z "$TEMPLATE" ] || [ -z "$CLASS" ] ; then
 
-    adicli_help
+    usage
 
   fi
 
 fi
 
+export EDIT_ACTION

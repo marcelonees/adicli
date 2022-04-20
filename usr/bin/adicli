@@ -114,10 +114,16 @@ function generate() {
         ;;
     esac
   
-    echo "        \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELD_Objects.txt"
+    # FORM_FIELDS_{Objects,Fields}
+    echo "        \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
     echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
-    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS.txt"
-    echo "        \$this->addFilterField('$field', '=', '$field'); // filterField, operator, formField" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+
+    # LIST_COLUMNS_{Objects,Fields}    
+    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+    echo "        \$this->datagrid->addColumn(\$column_$field);"     		                                >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+
+    # FILTER_FIELDS
+    echo "        \$this->addFilterField('$field', '=', '$field');"                                     >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
     field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
     if [ "X$field" != "X" ] ; then
@@ -139,10 +145,14 @@ function DINAMIC_CODE() {
 # FORM_FIELDS
 # ==============================================================================
 function FORM_FIELDS() {
+  echo "// create the form fields"
   echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/FORM_FIELD_Objects.txt"
+  cat "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
   echo "{NEWLINE}"
 
+  echo "{NEWLINE}"
+  echo "// add the fields"
+  echo "{NEWLINE}"
   cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
   echo "{NEWLINE}"
 }
@@ -151,7 +161,15 @@ function FORM_FIELDS() {
 # LIST_COLUMNS
 # ==============================================================================
 function LIST_COLUMNS () {
-  cat "/tmp/adicli/$pid/LIST_COLUMNS.txt"
+  echo "// creates the datagrid columns"
+  echo "{NEWLINE}"
+  cat "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+  echo "{NEWLINE}"
+
+  echo "{NEWLINE}"
+  echo "// add the columns to the DataGrid"
+  echo "{NEWLINE}"
+  cat "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
   echo "{NEWLINE}"
 }
 
@@ -159,6 +177,8 @@ function LIST_COLUMNS () {
 # FILTER_FIELDS
 # ==============================================================================
 function FILTER_FIELDS() {
+  echo "// add the filter fields ('filterField', 'operator', 'formField')"
+  echo "{NEWLINE}"
   cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
   echo "{NEWLINE}"
 }
@@ -166,7 +186,7 @@ function FILTER_FIELDS() {
 
 # List tables or Generate the Class
 # ==============================================================================
-if [ "X$option" = "Xlist" ] ; then
+if [ "X$option" = "Xshow tables" ] ; then
 
   list
 
@@ -190,13 +210,13 @@ else
     s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
     s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
     s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
-    s|{NEWLINE}|\n|g;
     s|<your name here>|${AUTHOR}|g;
     s|^[$]|\n        $|g;
     s|; [$]|;\n        $|g;
     s|parent::|\n    parent::|g;
     s|{LIMIT}|$LIMIT|g;
     s|{EDIT_ACTION}|$EDIT_ACTION|g;
+    s|{NEWLINE}|\n|g;
   " "$TEMPLATE"
 
 
