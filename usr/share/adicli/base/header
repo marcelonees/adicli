@@ -8,12 +8,12 @@
 
 usage() {
   echo
-  echo "Use: $0 -c /etc/adicli/databases/database.conf -t Table -T Template -C ClassName -a ActiveRecord"
+  echo "Use: $0 -c /etc/adicli/databases/database.conf -t Table -T Template -M Model -C ClassName"
   echo
 
 cat <<EOF
 Config
-=============================
+================================================================================
 db............: $db
 db_engine.....: $db_engine
 db_host.......: $db_host
@@ -31,9 +31,10 @@ Author........: $AUTHOR
 Parent Class..: $PARENT_CLASS  (TPage, TStandardList etc..)
 Option........: $option        ("show tables"|"show templates")
 Strategy......: $STRATEGY      (max|serial)
+================================================================================
 
 Example
-=============================
+================================================================================
   adicli -c /etc/adicli/databases/mysql.conf  \\
          -T /usr/share/adicli/framework/templates/list/StandardList.php \\
          -A "Full Name <your_email@domain" \\
@@ -75,7 +76,7 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
-        "list"|"show tables")
+        "list"|"show tables"|"showtables"|"show templates"|"showtemplates")
         ;;
         *)
           echo "$0: Error - Invalid option ($OPTARG)"
