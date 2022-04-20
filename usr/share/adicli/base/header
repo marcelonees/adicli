@@ -35,12 +35,38 @@ Strategy......: $STRATEGY      (max|serial)
 
 Example
 ================================================================================
+
+Create a Customers Model
+========================
+
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/model/Model.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C Customers > Customers.class.php
+
+
+Create a Customers Form
+========================
+
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/form/StandardForm.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C CustomersForm > CustomersForm.class.php
+
+
+Create a Customers List
+========================
+
   adicli -c /etc/adicli/databases/mysql.conf  \\
          -T /usr/share/adicli/framework/templates/list/StandardList.php \\
          -A "Full Name <your_email@domain" \\
-         -t customer \\
-         -M Customer \\
-         -C CustomersList
+         -t customers \\
+         -M Customers \\
+         -C CustomersList > CustomersList.class.php
 
 EOF
 

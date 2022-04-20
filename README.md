@@ -49,6 +49,39 @@ adicli  -c /etc/adicli/databases/database.conf \
         -T /usr/share/adicli/framework/templates/form/StandardForm.php \
         -C CustomersForm > CustomersForm.class.php"
 ```
+
+### Criar o Model de Customers
+
+```
+  adicli -c /etc/adicli/databases/mysql.conf  \
+         -T /usr/share/adicli/framework/templates/model/Model.php \
+         -A "Full Name <your_email@domain" \
+         -t customers \
+         -M Customers \
+         -C Customers > Customers.class.php
+```
+
+### Criar um formulário de Customers
+
+```
+  adicli -c /etc/adicli/databases/mysql.conf  \
+         -T /usr/share/adicli/framework/templates/form/StandardForm.php \
+         -A "Full Name <your_email@domain" \
+         -t customers \
+         -M Customers \
+         -C CustomersForm > CustomersForm.class.php
+```
+
+### Criar uma listagem de Customers
+
+```
+  adicli -c /etc/adicli/databases/mysql.conf  \
+         -T /usr/share/adicli/framework/templates/list/StandardList.php \
+         -A "Full Name <your_email@domain" \
+         -t customers \
+         -M Customers \
+         -C CustomersList > CustomersList.class.php
+```
 ### Ajustes e melhorias
 
 O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas para substituir as seguintes MÁSCARAS dentro das templates:
