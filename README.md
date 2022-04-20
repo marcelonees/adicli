@@ -42,13 +42,10 @@ cd adicli
 ```
 
 ## ☕ Como usar
-```
-adicli  -c /etc/adicli/databases/database.conf \
-        -t Customers \
-        -M Customers \
-        -T /usr/share/adicli/framework/templates/form/StandardForm.php \
-        -C CustomersForm > CustomersForm.class.php"
-```
+
+O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar o arquivo php.
+
+Veja à seguir alguns exemplos.
 
 ### Criar o Model de Customers
 
