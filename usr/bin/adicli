@@ -149,8 +149,16 @@ function generate() {
 # DINAMIC_CODE
 # ==============================================================================
 function DINAMIC_CODE() {
+  
+  echo "  /\*\*{NEWLINE}"
+  echo "   \* Constructor method{NEWLINE}"
+  echo "   \*/{NEWLINE}"
+  echo "  public function __construct(\$$PRIMARYKEY = NULL, \$callObjectLoad = TRUE){NEWLINE}"
+  echo "  {    {NEWLINE}"
+  echo "      parent::__construct(\$$PRIMARYKEY, \$callObjectLoad);{NEWLINE}"
   cat "/tmp/adicli/$pid/DINAMIC_CODE.txt"
   echo "{NEWLINE}"
+  echo "    }{NEWLINE}"
 }
 
 

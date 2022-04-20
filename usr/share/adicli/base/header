@@ -76,7 +76,7 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
-        "list"|"show tables"|"showtables"|"show templates"|"showtemplates")
+        "help"|"show tables"|"showtables"|"show templates"|"showtemplates")
         ;;
         *)
           echo "$0: Error - Invalid option ($OPTARG)"
@@ -114,9 +114,10 @@ fi
 
 # List tables
 # ==============================================================================
-if [ "X$option" == "Xlist" ] ; then
+if [ "X$option" == "Xhelp" ] ; then
 
-  echo
+  usage
+  exit
 
 else
 
