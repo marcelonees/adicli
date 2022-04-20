@@ -17,28 +17,166 @@ if [ ! -e $conf_header ] || [ ! -e $conf_db_engine ] ; then
 fi
 
 source $conf_header
-source $conf_db_engine
+
 
 # ==============================================================================
 #
 # Executa as queries, altera o template selecionado e retorna na tela
 #
 # ==============================================================================
+function generate() {
+
+  source $conf_db_engine
+
+  # unix timestamp
+  timestamp=$(date +"%s")
+
+  # PID
+  export pid="${timestamp}.$$"
+
+  # Create temporary dir
+  mkdir -p "/tmp/adicli/$pid"
+
+  # Default values for some vars
+  STRATEGY=${STRATEGY:-max}
+  AUTHOR=${AUTHOR:-Authors\'s Full Name <mail@domain>}
+  PARENT_CLASS=${PARENT_CLASS:-TPage}
+  LIMIT=${LIMIT:-10}
+
+  # Generate Models, Forms, Lists etc..
+  # ==============================================================================
+  function read_fields() {
+    echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
+    
+      type=$(echo $type|sed -e 's/(.*//g;')
+
+      case $type in
+        varchar)
+          type_adianti="TEntry";
+          ;;
+      
+        datetime|timestamp)
+          type_adianti="TDate";
+        ;;
+      
+        *)
+          type_adianti="TEntry";
+          ;;
+      esac
+    
+      # FORM_FIELDS_{Objects,Fields}
+           "      "
+      echo "      \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      echo "      \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+
+      # LIST_COLUMNS_{Objects,Fields}    
+      echo "      \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+      echo "      \$this->datagrid->addColumn(\$column_$field);"     		                                >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+
+      # FILTER_FIELDS
+      echo "      \$this->addFilterField('$field', '=', '$field');"                                     >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+
+      field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
+      if [ "X$field" != "X" ] ; then
+      echo "      parent::addAttribute('$field');"                                			                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+      fi
+    
+    done
+
+  }
+
+  # DINAMIC_CODE
+  # ==============================================================================
+  function DINAMIC_CODE() {
+    
+    echo "  /\*\*{NEWLINE}"
+    echo "   \* Constructor method{NEWLINE}"
+    echo "   \*/{NEWLINE}"
+    echo "  public function __construct(\$$PRIMARYKEY = NULL, \$callObjectLoad = TRUE){NEWLINE}"
+    echo "  {    {NEWLINE}"
+    echo "      parent::__construct(\$$PRIMARYKEY, \$callObjectLoad);{NEWLINE}"
+    cat "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+    echo "{NEWLINE}"
+    echo "    }{NEWLINE}"
+  }
 
 
-# unix timestamp
-timestamp=$(date +"%s")
+  # FORM_FIELDS
+  # ==============================================================================
+  function FORM_FIELDS() {
+    echo "// create the form fields"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+    echo "{NEWLINE}"
 
-# PID
-export pid="${timestamp}.$$"
+    echo "{NEWLINE}"
+    echo "// add the fields"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
+    echo "{NEWLINE}"
+  }
 
-# Create temporary dir
-mkdir -p "/tmp/adicli/$pid"
 
-STRATEGY=${STRATEGY:-max}
-AUTHOR=${AUTHOR:-Authors\'s Full Name <mail@domain>}
-PARENT_CLASS=${PARENT_CLASS:-TPage}
-LIMIT=${LIMIT:-10}
+  # LIST_COLUMNS
+  # ==============================================================================
+  function LIST_COLUMNS () {
+    echo "// creates the datagrid columns"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+    echo "{NEWLINE}"
+
+    echo "{NEWLINE}"
+    echo "// add the columns to the DataGrid"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+    echo "{NEWLINE}"
+  }
+
+
+  # FILTER_FIELDS
+  # ==============================================================================
+  function FILTER_FIELDS() {
+    echo "// add the filter fields ('filterField', 'operator', 'formField')"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+    echo "{NEWLINE}"
+  }
+
+
+  # Read the table for fields and types
+  # ==============================================================================
+  read_fields
+
+
+  # Substitute MASKS on the template
+  # ==============================================================================
+  sed -e "
+    s|{AUTHOR}|${AUTHOR}|g; 
+    s|{TABLENAME}|${TABLENAME}|g; 
+    s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
+    s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
+    s|{STRATEGY}|$STRATEGY|g; 
+    s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
+    s|{CLASS}|$CLASS|g; 
+    s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
+    s|{DATABASE}|$DATABASE|g; 
+    s|{PARENT_CLASS}|$PARENT_CLASS|g; 
+    s|##INIT_METHODS##|$INIT_METHODS|g; 
+    s|##FORM_SETUP##|$FORM_SETUP|g; 
+    s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
+    s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
+    s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
+    s|<your name here>|${AUTHOR}|g;
+    s|^[$]|\n        $|g;
+    s|; [$]|;\n        $|g;
+    s|parent::|\n    parent::|g;
+    s|{LIMIT}|$LIMIT|g;
+    s|{EDIT_ACTION}|$EDIT_ACTION|g;
+    s|{NEWLINE}|\n|g;
+    " "$TEMPLATE"
+
+}
+
 
 ##INIT_METHODS##
 ##FORM_SETUP##
@@ -86,7 +224,7 @@ LIMIT=${LIMIT:-10}
 # ==============================================================================
 
 
-# Swho tables
+# Show tables
 # ==============================================================================
 function show_tables() {
   echo "$show_tables"|$db_connector
@@ -105,103 +243,49 @@ function show_templates() {
 }
 
 
-# Generate Models, Forms, Lists etc..
+# Show Examples
 # ==============================================================================
-function generate() {
-  echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
-  
-    type=$(echo $type|sed -e 's/(.*//g;')
+function show_examples() {
+cat <<EOF
+How to Use
+================================================================================
 
-    case $type in
-      varchar)
-        type_adianti="TEntry";
-        ;;
-    
-      datetime|timestamp)
-        type_adianti="TDate";
-    	;;
-    
-      *)
-        type_adianti="TEntry";
-        ;;
-    esac
-  
-    # FORM_FIELDS_{Objects,Fields}
-    echo "        \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-    echo "        \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+Create a Customers Model
+========================
 
-    # LIST_COLUMNS_{Objects,Fields}    
-    echo "        \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-    echo "        \$this->datagrid->addColumn(\$column_$field);"     		                                >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/model/Model.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C Customers > Customers.class.php
 
-    # FILTER_FIELDS
-    echo "        \$this->addFilterField('$field', '=', '$field');"                                     >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
-    field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
-    if [ "X$field" != "X" ] ; then
-      echo "      parent::addAttribute('$field');"                                			                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
-    fi
-   
-  done
+Create a Customers Form
+========================
+
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/form/StandardForm.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C CustomersForm > CustomersForm.class.php
+
+
+Create a Customers List
+========================
+
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/list/StandardList.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C CustomersList > CustomersList.class.php
+
+EOF
 }
 
 
-# DINAMIC_CODE
-# ==============================================================================
-function DINAMIC_CODE() {
-  
-  echo "  /\*\*{NEWLINE}"
-  echo "   \* Constructor method{NEWLINE}"
-  echo "   \*/{NEWLINE}"
-  echo "  public function __construct(\$$PRIMARYKEY = NULL, \$callObjectLoad = TRUE){NEWLINE}"
-  echo "  {    {NEWLINE}"
-  echo "      parent::__construct(\$$PRIMARYKEY, \$callObjectLoad);{NEWLINE}"
-  cat "/tmp/adicli/$pid/DINAMIC_CODE.txt"
-  echo "{NEWLINE}"
-  echo "    }{NEWLINE}"
-}
-
-
-# FORM_FIELDS
-# ==============================================================================
-function FORM_FIELDS() {
-  echo "// create the form fields"
-  echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-  echo "{NEWLINE}"
-
-  echo "{NEWLINE}"
-  echo "// add the fields"
-  echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
-  echo "{NEWLINE}"
-}
-
-
-# LIST_COLUMNS
-# ==============================================================================
-function LIST_COLUMNS () {
-  echo "// creates the datagrid columns"
-  echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-  echo "{NEWLINE}"
-
-  echo "{NEWLINE}"
-  echo "// add the columns to the DataGrid"
-  echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
-  echo "{NEWLINE}"
-}
-
-
-# FILTER_FIELDS
-# ==============================================================================
-function FILTER_FIELDS() {
-  echo "// add the filter fields ('filterField', 'operator', 'formField')"
-  echo "{NEWLINE}"
-  cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
-  echo "{NEWLINE}"
-}
 
 
 # List Options or Generate the Class
@@ -218,33 +302,12 @@ case $option in
     exit
     ;;
 
+  "showexamples")
+    show_examples
+    exit
+    ;;
   *)
     generate
-
-    sed -e "
-      s|{AUTHOR}|${AUTHOR}|g; 
-      s|{TABLENAME}|${TABLENAME}|g; 
-      s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
-      s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
-      s|{STRATEGY}|$STRATEGY|g; 
-      s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
-      s|{CLASS}|$CLASS|g; 
-      s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
-      s|{DATABASE}|$DATABASE|g; 
-      s|{PARENT_CLASS}|$PARENT_CLASS|g; 
-      s|##INIT_METHODS##|$INIT_METHODS|g; 
-      s|##FORM_SETUP##|$FORM_SETUP|g; 
-      s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
-      s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
-      s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
-      s|<your name here>|${AUTHOR}|g;
-      s|^[$]|\n        $|g;
-      s|; [$]|;\n        $|g;
-      s|parent::|\n    parent::|g;
-      s|{LIMIT}|$LIMIT|g;
-      s|{EDIT_ACTION}|$EDIT_ACTION|g;
-      s|{NEWLINE}|\n|g;
-      " "$TEMPLATE"
     ;;
 esac
 

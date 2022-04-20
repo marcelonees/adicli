@@ -5,13 +5,18 @@
 #
 # ==============================================================================
 
-
+#
+# Usage
+#
 usage() {
   echo
-  echo "Use: $0 -c /etc/adicli/databases/database.conf -t Table -T Template -M Model -C ClassName"
+  echo "Use: $0 -c database.conf -t Table -T Template -M Model -C ClassName"
   echo
+}
 
+test() {
 cat <<EOF
+
 Config
 ================================================================================
 db............: $db
@@ -25,7 +30,7 @@ Optional        Value          Example
 ================================================================================
 db_table......: $db_table
 Template......: $TEMPLATE      (Look in /usr/share/adicli/framework/templates)
-Model.........: $MODEL         (E.g: For Customer.class.network, use Customer)
+Model.........: $MODEL         (E.g: For Customer.class.php, use Customer)
 Class.........: $CLASS         (E.g: For a Customer's Form, use CustomerForm)
 Author........: $AUTHOR
 Parent Class..: $PARENT_CLASS  (TPage, TStandardList etc..)
@@ -33,43 +38,7 @@ Option........: $option        ("show tables"|"show templates")
 Strategy......: $STRATEGY      (max|serial)
 ================================================================================
 
-Example
-================================================================================
-
-Create a Customers Model
-========================
-
-  adicli -c /etc/adicli/databases/mysql.conf  \\
-         -T /usr/share/adicli/framework/templates/model/Model.php \\
-         -A "Full Name <your_email@domain" \\
-         -t customers \\
-         -M Customers \\
-         -C Customers > Customers.class.php
-
-
-Create a Customers Form
-========================
-
-  adicli -c /etc/adicli/databases/mysql.conf  \\
-         -T /usr/share/adicli/framework/templates/form/StandardForm.php \\
-         -A "Full Name <your_email@domain" \\
-         -t customers \\
-         -M Customers \\
-         -C CustomersForm > CustomersForm.class.php
-
-
-Create a Customers List
-========================
-
-  adicli -c /etc/adicli/databases/mysql.conf  \\
-         -T /usr/share/adicli/framework/templates/list/StandardList.php \\
-         -A "Full Name <your_email@domain" \\
-         -t customers \\
-         -M Customers \\
-         -C CustomersList > CustomersList.class.php
-
 EOF
-
 }
 
 
@@ -102,7 +71,7 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
     O)
       option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
       case $option in
-        "help"|"show tables"|"showtables"|"show templates"|"showtemplates")
+        "help"|"show tables"|"showtables"|"show templates"|"showtemplates"|"show examples"|"showexamples")
         ;;
         *)
           echo "$0: Error - Invalid option ($OPTARG)"
@@ -126,26 +95,29 @@ while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
 done
 
 
-if [ -z "$conf_file" ] || [ ! -f "$conf_file" ]; then
 
-  echo "$0: Error - Invalid database config file"
-  #exit 2
-
-else
-
-  source "$conf_file"
-
-fi
 
 
 # List tables
 # ==============================================================================
-if [ "X$option" == "Xhelp" ] ; then
+if [ "X$option" != "X" ] ; then
 
-  usage
-  exit
+  echo 
+  #usage
+  #exit
 
 else
+
+  if [ -z "$conf_file" ] || [ ! -f "$conf_file" ]; then
+
+    echo "$0: Error - Invalid database config file"
+    #exit 2
+
+  else
+
+    source "$conf_file"
+
+  fi
 
   # Verifica se todos os parametros foram passados
 
