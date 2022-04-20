@@ -46,7 +46,7 @@ cd adicli
 O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar o arquivo php.
 
 ```
-  adicli -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]
+adicli -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]
 ```
 
 Veja à seguir alguns exemplos.
@@ -54,46 +54,46 @@ Veja à seguir alguns exemplos.
 ### Criar o Model de Customers
 
 ```
-  adicli -c /etc/adicli/databases/mysql.conf  \
-         -T /usr/share/adicli/framework/templates/model/Model.php \
-         -A "Full Name <your_email@domain" \
-         -t customers \
-         -M Customers \
-         -C Customers > Customers.class.php
+adicli -c /etc/adicli/databases/mysql.conf  \
+       -T /usr/share/adicli/framework/templates/model/Model.php \
+       -A "Full Name <your_email@domain" \
+       -t customers \
+       -M Customers \
+       -C Customers > Customers.class.php
 ```
 
 ### Criar um formulário de Customers
 
 ```
-  adicli -c /etc/adicli/databases/mysql.conf  \
-         -T /usr/share/adicli/framework/templates/form/StandardForm.php \
-         -A "Full Name <your_email@domain" \
-         -t customers \
-         -M Customers \
-         -C CustomersForm > CustomersForm.class.php
+adicli -c /etc/adicli/databases/mysql.conf  \
+       -T /usr/share/adicli/framework/templates/form/StandardForm.php \
+       -A "Full Name <your_email@domain" \
+       -t customers \
+       -M Customers \
+       -C CustomersForm > CustomersForm.class.php
 ```
 
 ### Criar uma listagem de Customers
 
 ```
-  adicli -c /etc/adicli/databases/mysql.conf  \
-         -T /usr/share/adicli/framework/templates/list/StandardList.php \
-         -A "Full Name <your_email@domain" \
-         -t customers \
-         -M Customers \
-         -C CustomersList > CustomersList.class.php
+adicli -c /etc/adicli/databases/mysql.conf  \
+       -T /usr/share/adicli/framework/templates/list/StandardList.php \
+       -A "Full Name <your_email@domain" \
+       -t customers \
+       -M Customers \
+       -C CustomersList > CustomersList.class.php
 ```
 
 ### Listando as tabelas de um banco de dados
 
 ```
-  adicli -c database.conf -O tables
+adicli -c database.conf -O tables
 ```
 
 ### Listando as templates disponíveis
 
 ```
-  adicli -c database.conf -O templates
+adicli -c database.conf -O templates
 ```
 
 ### Ajustes e melhorias
