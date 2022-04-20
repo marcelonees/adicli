@@ -43,7 +43,6 @@ case $db_engine in
     PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g')
     PRIMARYKEY=$PRIMARY_KEY
     show_tables="show tables;"
-
     ;;
 
   #

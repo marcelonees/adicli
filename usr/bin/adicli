@@ -86,10 +86,22 @@ LIMIT=${LIMIT:-10}
 # ==============================================================================
 
 
-# List tables
+# Swho tables
 # ==============================================================================
-function list() {
+function show_tables() {
   echo "$show_tables"|$db_connector
+}
+
+# Show Templates
+# ==============================================================================
+function show_templates() {
+  echo
+  echo "Templates"
+  echo "============================="
+  cd /usr/share/adicli/framework/templates/ || exit
+  find /usr/share/adicli/framework/templates|grep .php$
+  echo
+  exit 1
 }
 
 
@@ -184,44 +196,48 @@ function FILTER_FIELDS() {
 }
 
 
-# List tables or Generate the Class
+# List Options or Generate the Class
 # ==============================================================================
-if [ "X$option" = "Xshow tables" ] ; then
 
-  list
+case $option in
+  "show tables")
+    show_tables
+    ;;
 
-else
+  "show templates")
+    show_templates
+    ;;
 
-  generate
+  *)
+    generate
 
-  sed -e "
-    s|{AUTHOR}|${AUTHOR}|g; 
-    s|{TABLENAME}|${TABLENAME}|g; 
-    s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
-    s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
-    s|{STRATEGY}|$STRATEGY|g; 
-    s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
-    s|{CLASS}|$CLASS|g; 
-    s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
-    s|{DATABASE}|$DATABASE|g; 
-    s|{PARENT_CLASS}|$PARENT_CLASS|g; 
-    s|##INIT_METHODS##|$INIT_METHODS|g; 
-    s|##FORM_SETUP##|$FORM_SETUP|g; 
-    s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
-    s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
-    s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
-    s|<your name here>|${AUTHOR}|g;
-    s|^[$]|\n        $|g;
-    s|; [$]|;\n        $|g;
-    s|parent::|\n    parent::|g;
-    s|{LIMIT}|$LIMIT|g;
-    s|{EDIT_ACTION}|$EDIT_ACTION|g;
-    s|{NEWLINE}|\n|g;
-  " "$TEMPLATE"
+    sed -e "
+      s|{AUTHOR}|${AUTHOR}|g; 
+      s|{TABLENAME}|${TABLENAME}|g; 
+      s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
+      s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
+      s|{STRATEGY}|$STRATEGY|g; 
+      s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
+      s|{CLASS}|$CLASS|g; 
+      s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
+      s|{DATABASE}|$DATABASE|g; 
+      s|{PARENT_CLASS}|$PARENT_CLASS|g; 
+      s|##INIT_METHODS##|$INIT_METHODS|g; 
+      s|##FORM_SETUP##|$FORM_SETUP|g; 
+      s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
+      s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
+      s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
+      s|<your name here>|${AUTHOR}|g;
+      s|^[$]|\n        $|g;
+      s|; [$]|;\n        $|g;
+      s|parent::|\n    parent::|g;
+      s|{LIMIT}|$LIMIT|g;
+      s|{EDIT_ACTION}|$EDIT_ACTION|g;
+      s|{NEWLINE}|\n|g;
+      " "$TEMPLATE"
+    ;;
+esac
 
-
-  # Clean files
-  # ==============================================================================
-  rm -rf "/tmp/adicli/$pid"
-
-fi
+# Clean files
+# ==============================================================================
+rm -rf "/tmp/adicli/$pid"
