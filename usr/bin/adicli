@@ -111,7 +111,7 @@ function generate() {
   echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
   
     type=$(echo $type|sed -e 's/(.*//g;')
-  
+
     case $type in
       varchar)
         type_adianti="TEntry";
@@ -200,12 +200,14 @@ function FILTER_FIELDS() {
 # ==============================================================================
 
 case $option in
-  "show tables")
+  "showtables")
     show_tables
+    exit
     ;;
 
-  "show templates")
+  "showtemplates")
     show_templates
+    exit
     ;;
 
   *)

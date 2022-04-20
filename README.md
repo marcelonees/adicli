@@ -45,6 +45,7 @@ cd adicli
 ```
 adicli  -c /etc/adicli/databases/database.conf \
         -t Customers \
+        -M Customers \
         -T /usr/share/adicli/framework/templates/form/StandardForm.php \
         -C CustomersForm > CustomersForm.class.php"
 ```
