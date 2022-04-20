@@ -45,6 +45,10 @@ cd adicli
 
 O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar o arquivo php.
 
+```
+  adicli -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]
+```
+
 Veja à seguir alguns exemplos.
 
 ### Criar o Model de Customers
@@ -79,6 +83,19 @@ Veja à seguir alguns exemplos.
          -M Customers \
          -C CustomersList > CustomersList.class.php
 ```
+
+### Listando as tabelas de um banco de dados
+
+```
+  adicli -c database.conf -O tables
+```
+
+### Listando as templates disponíveis
+
+```
+  adicli -c database.conf -O templates
+```
+
 ### Ajustes e melhorias
 
 O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas para substituir as seguintes MÁSCARAS dentro das templates:
