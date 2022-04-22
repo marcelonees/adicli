@@ -65,7 +65,6 @@ function generate() {
       esac
     
       # FORM_FIELDS_{Objects,Fields}
-           "      "
       echo "      \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
       echo "      \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
