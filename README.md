@@ -1,28 +1,20 @@
-# adicli
+## adicli
 Adianti CLI (Command Line Interface)
 
-<img src="usr/share/adicli/images/screenshot.gif" alt="Screenshot">
+<img src="https://raw.githubusercontent.com/marcelonees/adicli/master/usr/share/adicli/images/screenshot.gif" alt="Screenshot">
 
-<!--
-![GitHub repo size](https://img.shields.io/github/repo-size/iuricode/README-template?style=for-the-badge)
-![GitHub language count](https://img.shields.io/github/languages/count/iuricode/README-template?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/iuricode/README-template?style=for-the-badge)
--->
-
-A intenção de criar esta ferramenta de linha de comando não é substituir o [Adianti Studio](https://www.adianti.com.br/studio), 
-que é uma ferramenta incrível e que aumenta em muito a produtividade, desenvolvido por [Pablo Dall'oglio](https://dalloglio.net).
+A intenção de criar esta ferramenta de linha de comando não é substituir o [Adianti Studio](https://www.adianti.com.br/studio), que é uma ferramenta incrível e que aumenta em muito a produtividade, desenvolvido por [Pablo Dall'oglio](https://dalloglio.net).
 
 Ocorre que o Adianti Studio foi descontinuado, em favor do novo [Adianti Builder](https://www.adiantibuilder.com.br).
 
-Dessa forma, o adicli pretende ser uma interface rápida para criação de telas baseadas em templates, que podem ser customizados
-para atender necessidades específicas do desenvolvedor.
+Dessa forma, o adicli pretende ser uma interface rápida para criação de telas baseadas em templates, que podem ser customizados para atender necessidades específicas do desenvolvedor.
 
-Os templates inclusos no adicli são os mesmos disponíveis no [Sourceforge do Adianti](https://sourceforge.net/projects/adianti/).
+Os templates inclusos no adicli são os mesmos disponíveis no [Sourceforge](https://sourceforge.net/projects/adianti/) do Adianti.
 
-Segundo o site do [Framework Adianti](https://www.adianti.com.br):
+Segundo o [site](https://www.adianti.com.br) do Framework Adianti:
 
 >A missão da Adianti é aumentar a produtividade de sua comunidade.
->Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
+Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
 
 ## Sistemas Operacionais (testados):
 - Debian Gnu/Linux 11 (bullseye)
@@ -33,23 +25,33 @@ Segundo o site do [Framework Adianti](https://www.adianti.com.br):
 - MariaDB (mysql)
 - Firebird (isql-fb)
 
+---
+
 ## 🚀 Como instalar
 Logado como usuário root, faça:
-```bash
+```
 git clone https://github.com/marcelonees/adicli.git
 cd adicli
 ./install.sh
 ```
+
+---
 
 ## ☕ Como usar
 
 O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar o arquivo php.
 
 ```bash
-adicli -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]
+adicli -c database.conf \
+       -t Table \
+       -T Template \
+       -M Model \
+       -C ClassName [-O tables|templates|examples]
 ```
 
-Veja à seguir alguns exemplos.
+---
+
+## Exemplos de uso
 
 ### Criar o Model de Customers
 
@@ -62,6 +64,8 @@ adicli -c /etc/adicli/databases/mysql.conf  \
        -C Customers > Customers.class.php
 ```
 
+---
+
 ### Criar um formulário de Customers
 
 ```bash
@@ -72,6 +76,8 @@ adicli -c /etc/adicli/databases/mysql.conf  \
        -M Customers \
        -C CustomersForm > CustomersForm.class.php
 ```
+
+---
 
 ### Criar uma listagem de Customers
 
@@ -84,11 +90,14 @@ adicli -c /etc/adicli/databases/mysql.conf  \
        -C CustomersList > CustomersList.class.php
 ```
 
+---
+
 ### Listando as tabelas de um banco de dados
 
 ```bash
 adicli -c database.conf -O tables
 ```
+
 
 ### Listando as templates disponíveis
 
@@ -96,11 +105,15 @@ adicli -c database.conf -O tables
 adicli -O templates
 ```
 
+---
+
 ### Listando alguns exemplos de uso
 
 ```bash
 adicli -O examples
 ```
+
+---
 
 ### Ajustes e melhorias
 
@@ -144,6 +157,7 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 - [ ] ##STYLES##
 - [ ] ##TITLES##
 
+---
 
 ## 📫 Contribuindo
 <!---Se o seu README for longo ou se você tiver algum processo ou etapas específicas que deseja que os contribuidores sigam, considere a criação de um arquivo CONTRIBUTING.md separado--->
@@ -156,6 +170,9 @@ Para contribuir com adicli, siga estas etapas:
 5. Crie a solicitação de pull.
 
 Como alternativa, consulte a documentação do GitHub em [como criar uma solicitação pull](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
+
+
+---
 
 ## 🤝 Colaboradores 
 
@@ -174,9 +191,14 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
   </tr>
 </table>
 
+
+---
+
 ## 😄 Seja um dos contribuidores<br>
 
 Quer fazer parte desse projeto? Clique [AQUI](CONTRIBUTING.md) e leia como contribuir.
+
+---
 
 ## 📝 Licença
 
