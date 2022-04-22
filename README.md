@@ -93,7 +93,7 @@ adicli -c database.conf -O tables
 ### Listando as templates disponíveis
 
 ```
-adicli -c database.conf -O templates
+adicli -O templates
 ```
 
 ### Ajustes e melhorias
