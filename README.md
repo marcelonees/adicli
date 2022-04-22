@@ -96,6 +96,12 @@ adicli -c database.conf -O tables
 adicli -O templates
 ```
 
+### Listando alguns exemplos de uso
+
+```
+adicli -O examples
+```
+
 ### Ajustes e melhorias
 
 O projeto ainda está em desenvolvimento e as próximas atualizações serão voltadas para substituir as seguintes MÁSCARAS dentro das templates:
