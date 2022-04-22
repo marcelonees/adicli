@@ -46,7 +46,8 @@ adicli -c database.conf \
        -t Table \
        -T Template \
        -M Model \
-       -C ClassName [-O tables|templates|examples]
+       -C ClassName \ 
+      [-O tables|templates|examples]
 ```
 
 ---
