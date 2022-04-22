@@ -35,7 +35,7 @@ Segundo o site do [Framework Adianti](https://www.adianti.com.br):
 
 ## 🚀 Como instalar
 Logado como usuário root, faça:
-```
+```bash
 git clone https://github.com/marcelonees/adicli.git
 cd adicli
 ./install.sh
@@ -45,7 +45,7 @@ cd adicli
 
 O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar o arquivo php.
 
-```
+```bash
 adicli -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]
 ```
 
@@ -53,7 +53,7 @@ Veja à seguir alguns exemplos.
 
 ### Criar o Model de Customers
 
-```
+```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
        -T /usr/share/adicli/framework/templates/model/Model.php \
        -A "Full Name <your_email@domain" \
@@ -64,7 +64,7 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 
 ### Criar um formulário de Customers
 
-```
+```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
        -T /usr/share/adicli/framework/templates/form/StandardForm.php \
        -A "Full Name <your_email@domain" \
@@ -75,7 +75,7 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 
 ### Criar uma listagem de Customers
 
-```
+```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
        -T /usr/share/adicli/framework/templates/list/StandardList.php \
        -A "Full Name <your_email@domain" \
@@ -86,19 +86,19 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 
 ### Listando as tabelas de um banco de dados
 
-```
+```bash
 adicli -c database.conf -O tables
 ```
 
 ### Listando as templates disponíveis
 
-```
+```bash
 adicli -O templates
 ```
 
 ### Listando alguns exemplos de uso
 
-```
+```bash
 adicli -O examples
 ```
 
