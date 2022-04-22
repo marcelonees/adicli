@@ -226,7 +226,7 @@ function generate() {
 # Show tables
 # ==============================================================================
 function show_tables() {
-  source $conf_file || { 
+    source $conf_file || { 
     echo "conf_file ($conf_file) not found."
     exit 4
   }
