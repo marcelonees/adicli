@@ -12,7 +12,7 @@ Adianti CLI (Command Line Interface)
 A intenção de criar esta ferramenta de linha de comando não é substituir o [Adianti Studio](https://www.adianti.com.br/studio), 
 que é uma ferramenta incrível e que aumenta em muito a produtividade, desenvolvido por [Pablo Dall'oglio](https://dalloglio.net).
 
-Ocorre que esta ferramenta foi descontinuada, em favor do novo [Adianti Builder](https://www.adiantibuilder.com.br).
+Ocorre que o Adianti Studio foi descontinuado, em favor do novo [Adianti Builder](https://www.adiantibuilder.com.br).
 
 Dessa forma, o adicli pretende ser uma interface rápida para criação de telas baseadas em templates, que podem ser customizados
 para atender necessidades específicas do desenvolvedor.
@@ -21,8 +21,8 @@ Os templates inclusos no adicli são os mesmos disponíveis no [Sourceforge do A
 
 Segundo o site do [Framework Adianti](https://www.adianti.com.br):
 
-A missão da Adianti é aumentar a produtividade de sua comunidade.
-Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
+>A missão da Adianti é aumentar a produtividade de sua comunidade.
+>Queremos ser vistos como os melhores parceiros de TI para o seu negócio.
 
 ## Sistemas Operacionais (testados):
 - Debian Gnu/Linux 11 (bullseye)
