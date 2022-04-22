@@ -53,6 +53,10 @@ adicli -c database.conf \
 
 ## Exemplos de uso
 
+Veja outros exemplos de uso à seguir.
+
+---
+
 ### Criar o Model de Customers
 
 ```bash
@@ -98,6 +102,7 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 adicli -c database.conf -O tables
 ```
 
+---
 
 ### Listando as templates disponíveis
 
