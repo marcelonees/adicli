@@ -226,15 +226,22 @@ function generate() {
 # Show tables
 # ==============================================================================
 function show_tables() {
+  source $conf_file || { 
+    echo "conf_file ($conf_file) not found."
+    exit 4
+  }
+
+  source $conf_db_engine || {
+    echo "conf__db_engine ($conf__db_engine) not found."
+    exit 5    
+  }
+    
   echo "$show_tables"|$db_connector
 }
 
 # Show Templates
 # ==============================================================================
 function show_templates() {
-  echo
-  echo "Templates"
-  echo "============================="
   cd /usr/share/adicli/framework/templates/ || exit
   find /usr/share/adicli/framework/templates|grep .php$
   echo
@@ -290,11 +297,6 @@ EOF
 # List Options or Generate the Class
 # ==============================================================================
 case $option in
-  "tables")
-    show_tables
-    exit
-    ;;
-
   "templates")
     show_templates
     exit
@@ -304,9 +306,15 @@ case $option in
     show_examples
     exit
     ;;
+
+  "tables")
+    show_tables
+    exit
+    ;;
+    
   *)
     generate
-    ;;
+    ;;    
 esac
 
 # Clean files

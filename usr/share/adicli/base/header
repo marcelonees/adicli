@@ -138,6 +138,7 @@ else
       [ -z "$CLASS" ] ; then
 
     usage
+    exit
 
   fi
 
@@ -157,3 +158,4 @@ export MODEL
 export ACTIVE_RECORD
 export EDIT_ACTION
 export TABLENAME
+export conf_file
