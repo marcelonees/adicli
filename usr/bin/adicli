@@ -73,9 +73,8 @@ function generate() {
       esac
     
       # FORM_FIELDS_{Objects,Fields}
-      
       echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}"                             >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-      echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field'), \$$field ] );{NEWLINE}" 			>> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+      echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field')] , [ \$$field ] );{NEWLINE}"  >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
       # LIST_COLUMNS_{Objects,Fields}    
       echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}"  >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
@@ -113,6 +112,7 @@ function generate() {
   # FORM_FIELDS
   # ==============================================================================
   function FORM_FIELDS() {
+    echo "{NEWLINE}"
     echo "{TAB}{TAB} // create the form fields"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
@@ -129,6 +129,7 @@ function generate() {
   # LIST_COLUMNS
   # ==============================================================================
   function LIST_COLUMNS () {
+    echo "{NEWLINE}"
     echo "{TAB}{TAB} // creates the datagrid columns"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
@@ -145,6 +146,7 @@ function generate() {
   # FILTER_FIELDS
   # ==============================================================================
   function FILTER_FIELDS() {
+    echo "{NEWLINE}"
     echo "{TAB}{TAB} // add the filter fields ('filterField', 'operator', 'formField')"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
