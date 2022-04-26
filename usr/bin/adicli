@@ -46,6 +46,14 @@ function generate() {
   # Generate Models, Forms, Lists etc..
   # ==============================================================================
   function read_fields() {
+
+    echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+    echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+    echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+    echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+    echo "" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+    echo "" >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+
     echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
     
       type=$(echo "$type"|sed -e 's/(.*//g;')
@@ -65,19 +73,20 @@ function generate() {
       esac
     
       # FORM_FIELDS_{Objects,Fields}
-      echo "      \$$field = new $type_adianti('$field');"                        			                >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-      echo "      \$this->form->addFields( [ new TLabel('$field'), \$$field ] );" 			                >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+      
+      echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}"                             >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field'), \$$field ] );{NEWLINE}" 			>> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
       # LIST_COLUMNS_{Objects,Fields}    
-      echo "      \$column_$field = new TDataGridColumn('$field', '$field', 'left');"     		          >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-      echo "      \$this->datagrid->addColumn(\$column_$field);"     		                                >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+      echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}"  >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+      echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}"     		              >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
 
       # FILTER_FIELDS
-      echo "      \$this->addFilterField('$field', '=', '$field');"                                     >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+      echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}"                    >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
       field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
       if [ "X$field" != "X" ] ; then
-      echo "      parent::addAttribute('$field');"                                			                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			        >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
       fi
     
     done
@@ -88,28 +97,29 @@ function generate() {
   # ==============================================================================
   function DINAMIC_CODE() {
     
-    echo "  /\*\*{NEWLINE}"
-    echo "   \* Constructor method{NEWLINE}"
-    echo "   \*/{NEWLINE}"
-    echo "  public function __construct(\$$PRIMARYKEY = NULL, \$callObjectLoad = TRUE){NEWLINE}"
-    echo "  {    {NEWLINE}"
-    echo "      parent::__construct(\$$PRIMARYKEY, \$callObjectLoad);{NEWLINE}"
+    echo "{NEWLINE}{TAB} /\*\*{NEWLINE}"
+    echo "{TAB} \* Constructor method{NEWLINE}"
+    echo "{TAB} \*/{NEWLINE}"
+    echo "{TAB}public function __construct(\$$PRIMARYKEY = NULL, \$callObjectLoad = TRUE){NEWLINE}"
+    echo "{TAB}{{NEWLINE}"
+    echo "{TAB}{TAB}parent::__construct(\$$PRIMARYKEY, \$callObjectLoad);{NEWLINE}"
     cat "/tmp/adicli/$pid/DINAMIC_CODE.txt"
     echo "{NEWLINE}"
-    echo "    }{NEWLINE}"
+    echo "{TAB}}"
+    echo "{NEWLINE}"
   }
 
 
   # FORM_FIELDS
   # ==============================================================================
   function FORM_FIELDS() {
-    echo "// create the form fields"
+    echo "{TAB}{TAB} // create the form fields"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
     echo "{NEWLINE}"
 
     echo "{NEWLINE}"
-    echo "// add the fields"
+    echo "{TAB}{TAB} // add the fields"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
     echo "{NEWLINE}"
@@ -119,13 +129,13 @@ function generate() {
   # LIST_COLUMNS
   # ==============================================================================
   function LIST_COLUMNS () {
-    echo "// creates the datagrid columns"
+    echo "{TAB}{TAB} // creates the datagrid columns"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
     echo "{NEWLINE}"
 
     echo "{NEWLINE}"
-    echo "// add the columns to the DataGrid"
+    echo "{TAB}{TAB} // add the columns to the DataGrid"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
     echo "{NEWLINE}"
@@ -135,7 +145,7 @@ function generate() {
   # FILTER_FIELDS
   # ==============================================================================
   function FILTER_FIELDS() {
-    echo "// add the filter fields ('filterField', 'operator', 'formField')"
+    echo "{TAB}{TAB} // add the filter fields ('filterField', 'operator', 'formField')"
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FILTER_FIELDS.txt"
     echo "{NEWLINE}"
@@ -149,29 +159,32 @@ function generate() {
 
   # Substitute MASKS on the template
   # ==============================================================================
+  #s|parent::|      parent::|g;
+  #s|; parent::|;\n      parent::|g;
+  #s|; /|;\n|g;
+  #s|^[$]|\n        $|g;
   sed -e "
-    s|{AUTHOR}|${AUTHOR}|g; 
-    s|{TABLENAME}|${TABLENAME}|g; 
-    s|{PRIMARYKEY}|${PRIMARYKEY}|g; 
-    s|{PRIMARY_KEY}|${PRIMARYKEY}|g; 
-    s|{STRATEGY}|$STRATEGY|g; 
-    s|{DINAMIC_CODE}|$(echo `DINAMIC_CODE`)|g; 
-    s|{CLASS}|$CLASS|g; 
-    s|{ACTIVE_RECORD}|$ACTIVE_RECORD|g; 
-    s|{DATABASE}|$DATABASE|g; 
-    s|{PARENT_CLASS}|$PARENT_CLASS|g; 
-    s|##INIT_METHODS##|$INIT_METHODS|g; 
-    s|##FORM_SETUP##|$FORM_SETUP|g; 
-    s|##FORM_FIELDS##|$(echo `FORM_FIELDS`)|g;
-    s|##FILTER_FIELDS##|$(echo `FILTER_FIELDS`)|g;
-    s|##LIST_COLUMNS##|$(echo `LIST_COLUMNS`)|g;
+    s|{AUTHOR}|${AUTHOR}|g;
+    s|{TABLENAME}|${TABLENAME}|g;
+    s|{PRIMARYKEY}|${PRIMARYKEY}|g;
+    s|{PRIMARY_KEY}|${PRIMARYKEY}|g;
+    s|{STRATEGY}|${STRATEGY}|g;
+    s|{DINAMIC_CODE}|$(echo -n `DINAMIC_CODE`)|g;
+    s|{CLASS}|${CLASS}|g;
+    s|{ACTIVE_RECORD}|${ACTIVE_RECORD}|g;
+    s|{DATABASE}|${DATABASE}|g;
+    s|{PARENT_CLASS}|${PARENT_CLASS}|g;
+    s|##INIT_METHODS##|${INIT_METHODS}|g;
+    s|##FORM_SETUP##|${FORM_SETUP}|g;
+    s|##FORM_FIELDS##|$(echo -n `FORM_FIELDS`)|g;
+    s|##FILTER_FIELDS##|$(echo -n `FILTER_FIELDS`)|g;
+    s|##LIST_COLUMNS##|$(echo -n `LIST_COLUMNS`)|g;
     s|<your name here>|${AUTHOR}|g;
-    s|^[$]|\n        $|g;
-    s|; [$]|;\n        $|g;
-    s|parent::|\n    parent::|g;
-    s|{LIMIT}|$LIMIT|g;
-    s|{EDIT_ACTION}|$EDIT_ACTION|g;
+    s|{TAB}|   |g;
+    s|{LIMIT}|${LIMIT}|g;
+    s|{EDIT_ACTION}|${EDIT_ACTION}|g;
     s|{NEWLINE}|\n|g;
+    s| parent::|\n        parent::|g; 
     " "$TEMPLATE"
 
 }
@@ -226,17 +239,20 @@ function generate() {
 # Show tables
 # ==============================================================================
 function show_tables() {
-    source $conf_file || { 
+
+  source $conf_file || { 
     echo "conf_file ($conf_file) not found."
     exit 4
   }
 
   source $conf_db_engine || {
-    echo "conf__db_engine ($conf__db_engine) not found."
+    echo "conf_db_engine ($conf__db_engine) not found."
     exit 5    
   }
-    
+
+  # show tables
   echo "$show_tables"|$db_connector
+
 }
 
 # Show Templates
