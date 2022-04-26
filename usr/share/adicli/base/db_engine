@@ -33,7 +33,6 @@ case $db_engine in
     db_connector="mysql -s -h $db_host -P $db_port -u $db_admin -p$db_password $db"
 
     if [ "X$db_table" != "X" ] ; then
-      echo "\"SHOW KEYS FROM $db_table WHERE Key_name = 'PRIMARY';\"|$db_connector"
       PRIMARY_KEY=$(echo "SHOW KEYS FROM $db_table WHERE Key_name = 'PRIMARY';"|$db_connector|grep -i PRIMARY|awk '{print $5}')
       PRIMARYKEY=$PRIMARY_KEY
     fi
