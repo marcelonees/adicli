@@ -17,7 +17,7 @@ case $db_engine in
 
     if [ "X$db_table" != "X" ] ; then
       db_connector="psql -h $db_host -p $db_port -d $db -U $db_admin -w"
-      PRIMARY_KEY=$(echo "$db_command"|$db_connector -a |grep -i 'PRIMARY KEY'|awk '{print $5}'|sed -e 's/(//g; s/)//g')
+      PRIMARY_KEY=$(echo "$db_command"|$db_connector -a |grep -i 'PRIMARY KEY'|awk '{print $5}'|sed -e 's/(//g; s/)//g; s/,.*//g')
       PRIMARYKEY=$PRIMARY_KEY
     fi
 
@@ -48,7 +48,7 @@ case $db_engine in
     db_connector="isql-fb -u $db_admin -p $db_password $db_host/$db_port:$db"
 
     if [ "X$db_table" != "X" ] ; then
-      PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g')
+      PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g; s/,.*//g')
       PRIMARYKEY=$PRIMARY_KEY
     fi
 

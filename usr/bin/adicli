@@ -54,7 +54,9 @@ function generate() {
     echo "" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
     echo "" >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
 
-    echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
+    #echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
+    echo "$db_command"|$db_connector|grep -E -v '^($|CONSTRAINT)'|sed -e 's/|/ /g'|awk '{print $1, $2}'|while read field type; do
+    
     
       type=$(echo "$type"|sed -e 's/(.*//g;')
 
@@ -78,14 +80,14 @@ function generate() {
 
       # LIST_COLUMNS_{Objects,Fields}    
       echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}"  >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-      echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}"     		              >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+      echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}"     		               >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
 
       # FILTER_FIELDS
       echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}"                    >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
       field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
       if [ "X$field" != "X" ] ; then
-        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			        >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			                 >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
       fi
     
     done
