@@ -43,9 +43,10 @@ O adicli é intuitivo, basta passar os parâmetros solicitados e ele irá gerar 
 
 ```bash
 adicli -c database.conf \
+       -A "Full Name <your_email@domain" \
        -t Table \
-       -T Template \
        -M Model \
+       -T Template \
        -C ClassName \ 
        -O [tables|templates|examples]
 ```
@@ -62,10 +63,10 @@ Veja outros exemplos de uso à seguir.
 
 ```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
-       -T /usr/share/adicli/framework/templates/model/Model.php \
        -A "Full Name <your_email@domain" \
        -t customers \
        -M Customers \
+       -T /usr/share/adicli/framework/templates/model/Model.php \
        -C Customers > Customers.class.php
 ```
 
@@ -75,10 +76,10 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 
 ```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
-       -T /usr/share/adicli/framework/templates/form/StandardForm.php \
        -A "Full Name <your_email@domain" \
        -t customers \
        -M Customers \
+       -T /usr/share/adicli/framework/templates/form/StandardForm.php \
        -C CustomersForm > CustomersForm.class.php
 ```
 
@@ -88,10 +89,10 @@ adicli -c /etc/adicli/databases/mysql.conf  \
 
 ```bash
 adicli -c /etc/adicli/databases/mysql.conf  \
-       -T /usr/share/adicli/framework/templates/list/StandardList.php \
        -A "Full Name <your_email@domain" \
        -t customers \
        -M Customers \
+       -T /usr/share/adicli/framework/templates/list/StandardList.php \
        -C CustomersList > CustomersList.class.php
 ```
 
@@ -137,9 +138,9 @@ O projeto ainda está em desenvolvimento e as próximas atualizações serão vo
 - [x] ##FILTER_FIELDS##
 - [ ] ##FILTERS##
 - [ ] ##FILTER_SEARCHS##
-- [ ] ##FORM_FIELD[0]##
-- [ ] ##FORM_FIELD[1]##
-- [ ] ##FORM_FIELD[2]##
+- [x] ##FORM_FIELD[0]##
+- [x] ##FORM_FIELD[1]##
+- [x] ##FORM_FIELD[2]##
 - [ ] ##FORM_FIELD[3]##
 - [ ] ##FORM_FIELD[4]##
 - [ ] ##FORM_FIELD[5]##
