@@ -150,12 +150,16 @@ fi
 #
 DATABASE=$(basename "$conf_file"|sed -e 's/.conf$//g')
 EDIT_ACTION=${CLASS//List/Form}
+EDIT_CLASS=${CLASS//View/Form}
 TABLENAME=$db_table
 ACTIVE_RECORD=$MODEL
+ACTIVE_RECORD_LOWER=$(echo "${ACTIVE_RECORD}"|tr '[:upper:]' '[:lower:]')
 
 export DATABASE
 export MODEL
 export ACTIVE_RECORD
+export ACTIVE_RECORD_LOWER
 export EDIT_ACTION
+export EDIT_CLASS
 export TABLENAME
 export conf_file

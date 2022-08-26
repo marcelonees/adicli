@@ -49,10 +49,16 @@ function generate() {
 
     echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
     echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_0.txt"
+    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_1.txt"
+    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_2.txt"
     echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
     echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
     echo "" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
     echo "" >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+
+    echo "" >> "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+    echo "" >> "/tmp/adicli/$pid/SESSION_FILTERS.txt"
 
     #echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
     echo "$db_command"|$db_connector|grep -E -v '^($|CONSTRAINT)'|sed -e 's/|/ /g'|awk '{print $1, $2}'|while read field type; do
@@ -78,6 +84,11 @@ function generate() {
       echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}"                             >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
       echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field')] , [ \$$field ] );{NEWLINE}"  >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
+      # FORM_FIELD_{0,1,2}
+      echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}"               >> "/tmp/adicli/$pid/FORM_FIELD_0.txt"
+      echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}"   >> "/tmp/adicli/$pid/FORM_FIELD_1.txt"
+      echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}"               >> "/tmp/adicli/$pid/FORM_FIELD_2.txt"
+
       # LIST_COLUMNS_{Objects,Fields}    
       echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}"  >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
       echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}"     		               >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
@@ -85,9 +96,22 @@ function generate() {
       # FILTER_FIELDS
       echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}"                    >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
+      # FILTER_SEARCHS
+      echo "{TAB}{TAB} TSession::setValue('${CLASS}_filter_$field', {TAB}{TAB}{TAB}{TAB}NULL);{NEWLINE}"            >> "/tmp/adicli/$pid/FILTER_SEARCHS1.txt"
+
+      echo "{TAB}{TAB}if (isset(\$data->$field) AND (\$data->$field)) {{NEWLINE}
+            {TAB}{TAB}{TAB}{TAB}\$filter = new TFilter('$field', '=', \"{\$data->$field}\");{NEWLINE}
+            {TAB}{TAB}{TAB}{TAB}TSession::setValue('${CLASS}_filter_$field',   \$filter);{NEWLINE}
+            {TAB}{TAB}}{NEWLINE}{NEWLINE}"                                                                >> "/tmp/adicli/$pid/FILTER_SEARCHS2.txt"
+
+      # SESSION_FILTERS
+      echo "{TAB}{TAB}{TAB}{TAB}if (TSession::getValue('${CLASS}_filter_$field')) {{NEWLINE}
+            {TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\$criteria->add(TSession::getValue('${CLASS}_filter_$field'));{NEWLINE}
+            {TAB}{TAB}{TAB}{TAB}}{NEWLINE}{NEWLINE}"                                                                >> "/tmp/adicli/$pid/SESSION_FILTERS.txt"
+
       field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
       if [ "X$field" != "X" ] ; then
-        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			                 >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			                                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
       fi
     
     done
@@ -127,6 +151,25 @@ function generate() {
     echo "{NEWLINE}"
   }
 
+  # FORM_FIELD_{0,1,2}
+  # ==============================================================================
+  function FORM_FIELD_0() {
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FORM_FIELD_0.txt"
+    echo "{NEWLINE}"
+  }
+
+  function FORM_FIELD_1() {
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FORM_FIELD_1.txt"
+    echo "{NEWLINE}"
+  }
+
+  function FORM_FIELD_2() {
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FORM_FIELD_2.txt"
+    echo "{NEWLINE}"
+  }    
 
   # LIST_COLUMNS
   # ==============================================================================
@@ -155,6 +198,26 @@ function generate() {
     echo "{NEWLINE}"
   }
 
+  # FILTER_SEARCHS
+  # ==============================================================================
+  function FILTER_SEARCHS() {
+    cat "/tmp/adicli/$pid/FILTER_SEARCHS1.txt" >  "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+    echo "{NEWLINE}{NEWLINE}"
+    cat "/tmp/adicli/$pid/FILTER_SEARCHS2.txt" >> "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+  }
+
+  # SESSION_FILTERS
+  # ==============================================================================
+  function SESSION_FILTERS() {
+    echo "{NEWLINE}"
+    echo "{TAB}{TAB}{TAB}{TAB}// add the session filters"
+    echo "{NEWLINE}"
+    cat "/tmp/adicli/$pid/SESSION_FILTERS.txt"
+  }
+
 
   # Read the table for fields and types
   # ==============================================================================
@@ -167,6 +230,7 @@ function generate() {
   #s|; parent::|;\n      parent::|g;
   #s|; /|;\n|g;
   #s|^[$]|\n        $|g;
+
   sed -e "
     s|{AUTHOR}|${AUTHOR}|g;
     s|{TABLENAME}|${TABLENAME}|g;
@@ -178,12 +242,20 @@ function generate() {
     s|{ACTIVE_RECORD}|${ACTIVE_RECORD}|g;
     s|{DATABASE}|${DATABASE}|g;
     s|{PARENT_CLASS}|${PARENT_CLASS}|g;
+    s|{EDIT_CLASS}|${EDIT_CLASS}|g;
     s|##INIT_METHODS##|${INIT_METHODS}|g;
     s|##FORM_SETUP##|${FORM_SETUP}|g;
     s|##FORM_FIELDS##|$(echo -n `FORM_FIELDS`)|g;
+    s|##FORM_FIELD\[0\]##|$(echo -n `FORM_FIELD_0`)|g;
+    s|##FORM_FIELD\[1\]##|$(echo -n `FORM_FIELD_1`)|g;
+    s|##FORM_FIELD\[2\]##|$(echo -n `FORM_FIELD_2`)|g;
     s|##FILTER_FIELDS##|$(echo -n `FILTER_FIELDS`)|g;
+    s|##FILTER_SEARCHS##|$(echo -n `FILTER_SEARCHS`)|g;
+    s|##SESSION_FILTERS##|$(echo -n `SESSION_FILTERS`)|g;
     s|##LIST_COLUMNS##|$(echo -n `LIST_COLUMNS`)|g;
     s|<your name here>|${AUTHOR}|g;
+    s|form_name_REPLACE_HERE|form_${ACTIVE_RECORD}Seek|g;
+    s|{ACTIVE_RECORD_LOWER}|${ACTIVE_RECORD_LOWER}|g;
     s|{TAB}|   |g;
     s|{LIMIT}|${LIMIT}|g;
     s|{EDIT_ACTION}|${EDIT_ACTION}|g;
@@ -211,10 +283,10 @@ function generate() {
 ##DETAIL_FIELD[8]##
 ##FILTER_FIELDS## <- OK
 ##FILTERS##
-##FILTER_SEARCHS##
-##FORM_FIELD[0]##
-##FORM_FIELD[1]##
-##FORM_FIELD[2]##
+##FILTER_SEARCHS## <-- WORKING ON THIS
+##FORM_FIELD[0]##  <-- OK
+##FORM_FIELD[1]##  <-- OK
+##FORM_FIELD[2]##  <-- OK
 ##FORM_FIELD[3]##
 ##FORM_FIELD[4]##
 ##FORM_FIELD[5]##
@@ -234,7 +306,7 @@ function generate() {
 ##QUERY_FILTER[2]##
 ##QUERY_FILTER[3]##
 ##RESULT_FIELDS##
-##SESSION_FILTERS##
+##SESSION_FILTERS## <-- WORKING ON THIS
 ##STYLES##
 ##TITLES##
 # ==============================================================================
