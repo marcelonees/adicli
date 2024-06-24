@@ -32,7 +32,7 @@ Logado como usuário root, faça:
 ```
 git clone https://github.com/marcelonees/adicli.git
 cd adicli
-./install.sh
+sudo ./install.sh
 ```
 
 ---
