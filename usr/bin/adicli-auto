@@ -18,6 +18,18 @@ if [ "X${database}" == "X" ] || [ "X${table}" == "X" ] || [ "X${model}" == "X" ]
   infobox
 fi
 
+. /etc/adicli/adicli.conf
+
+template_model=${template_model:-"/usr/share/adicli/framework/templates/model/Model.php"}
+template_list=${template_model:-"/usr/share/adicli/framework/templates/list/CompleteList.php"}
+template_form=${template_model:-"/usr/share/adicli/framework/templates/form/CompleteForm.php"}
+
+echo 
+echo "ATENÇÂO! Este comando irá criar os arquivos dentro dos diretórios app/control/$database/$table/ e app/model/$database/$table/"
+echo "Aperte ENTER para continuar ou CTRL+C para cancelar"
+echo 
+read x
+
 mkdir -p app/model/$database/$table/
 mkdir -p app/control/$database/$table/
 

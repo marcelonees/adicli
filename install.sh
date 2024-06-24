@@ -23,6 +23,17 @@ fi
 mkdir -p /etc/adicli/databases 
 mkdir -p /usr/share/adicli
 
+if [ ! -f /etc/adicli/adicli.conf ] ; then
+
+cat <<EOF >/etc/adicli/adicli.conf
+#!/bin/bash
+
+template_model="/usr/share/adicli/framework/templates/model/Model.php"
+template_list="/usr/share/adicli/framework/templates/list/CompleteList.php"
+template_form="/usr/share/adicli/framework/templates/form/CompleteForm.php"
+
+EOF
+
 cp -R -f etc/adicli/*       /etc/adicli/
 cp -R -f usr/share/adicli/* /usr/share/adicli/
 cp    -f usr/bin/adicli*    /usr/bin/
@@ -30,7 +41,6 @@ cp    -f usr/bin/adicli*    /usr/bin/
 chown -R root:root /etc/adicli /usr/share/adicli/
 chmod -R 755 /etc/adicli/      /usr/share/adicli/ /usr/bin/adicli*
 chmod +x /usr/bin/adicli*
-
 
 # adicli successfully installed
 echo "adicli successfully installed!"
