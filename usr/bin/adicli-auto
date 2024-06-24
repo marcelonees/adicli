@@ -36,16 +36,16 @@ mkdir -p app/control/$database/$table/
 # Cria o modelo
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model} -T /usr/share/adicli/framework/templates/model/ModelPmjs.php > app/model/$database/$table/$model.class.php
+       -t $table -M $model -C ${model} -T $template_model > app/model/$database/$table/$model.class.php
 
 # Cria o arquivo de listagem
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model}List -T /usr/share/adicli/framework/templates/list/CompletePmjsList.php > app/control/$database/$table/${model}List.class.php
+       -t $table -M $model -C ${model}List -T $template_list > app/control/$database/$table/${model}List.class.php
 
 # Cria o form
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model}Form -T /usr/share/adicli/framework/templates/form/CompletePmjsForm.php > app/control/$database/$table/${model}Form.class.php
+       -t $table -M $model -C ${model}Form -T $template_form > app/control/$database/$table/${model}Form.class.php
 
 
