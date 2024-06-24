@@ -9,7 +9,7 @@
 conf_header=/usr/share/adicli/base/header
 conf_db_engine=/usr/share/adicli/base/db_engine
 
-if [ ! -e $conf_header ] || [ ! -e $conf_db_engine ] ; then
+if [ ! -e $conf_header ] || [ ! -e $conf_db_engine ]; then
 
   echo "$0: Error - Some framework files not found found."
   exit 1
@@ -17,7 +17,6 @@ if [ ! -e $conf_header ] || [ ! -e $conf_db_engine ] ; then
 fi
 
 source $conf_header
-
 
 # ==============================================================================
 #
@@ -47,73 +46,72 @@ function generate() {
   # ==============================================================================
   function read_fields() {
 
-    echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-    echo "" >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
-    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_0.txt"
-    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_1.txt"
-    echo "" >> "/tmp/adicli/$pid/FORM_FIELD_2.txt"
-    echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-    echo "" >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
-    echo "" >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
-    echo "" >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+    echo "" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+    echo "" >>"/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+    echo "" >>"/tmp/adicli/$pid/FORM_FIELD_0.txt"
+    echo "" >>"/tmp/adicli/$pid/FORM_FIELD_1.txt"
+    echo "" >>"/tmp/adicli/$pid/FORM_FIELD_2.txt"
+    echo "" >>"/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+    echo "" >>"/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+    echo "" >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+    echo "" >>"/tmp/adicli/$pid/DINAMIC_CODE.txt"
 
-    echo "" >> "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
-    echo "" >> "/tmp/adicli/$pid/SESSION_FILTERS.txt"
+    echo "" >>"/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+    echo "" >>"/tmp/adicli/$pid/SESSION_FILTERS.txt"
 
     #echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
-    echo "$db_command"|$db_connector|grep -E -v '^($|CONSTRAINT)'|sed -e 's/|/ /g'|awk '{print $1, $2}'|while read field type; do
-    
-    
-      type=$(echo "$type"|sed -e 's/(.*//g;')
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1, $2}' | while read field type; do
+
+      type=$(echo "$type" | sed -e 's/(.*//g;')
 
       case $type in
-        varchar)
-          type_adianti="TEntry";
-          ;;
-      
-        datetime|timestamp)
-          type_adianti="TDate";
+      varchar)
+        type_adianti="TEntry"
         ;;
-      
-        *)
-          type_adianti="TEntry";
-          ;;
+
+      datetime | timestamp)
+        type_adianti="TDate"
+        ;;
+
+      *)
+        type_adianti="TEntry"
+        ;;
       esac
-    
+
       # FORM_FIELDS_{Objects,Fields}
-      echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}"                             >> "/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
-      echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field')] , [ \$$field ] );{NEWLINE}"  >> "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
+      echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field')] , [ \$$field ] );{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
       # FORM_FIELD_{0,1,2}
-      echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}"               >> "/tmp/adicli/$pid/FORM_FIELD_0.txt"
-      echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}"   >> "/tmp/adicli/$pid/FORM_FIELD_1.txt"
-      echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}"               >> "/tmp/adicli/$pid/FORM_FIELD_2.txt"
+      echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_0.txt"
+      echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_1.txt"
+      echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_2.txt"
 
-      # LIST_COLUMNS_{Objects,Fields}    
-      echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}"  >> "/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
-      echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}"     		               >> "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
+      # LIST_COLUMNS_{Objects,Fields}
+      echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}" >>"/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
+      echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}" >>"/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
 
       # FILTER_FIELDS
-      echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}"                    >> "/tmp/adicli/$pid/FILTER_FIELDS.txt"
+      echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
 
       # FILTER_SEARCHS
-      echo "{TAB}{TAB} TSession::setValue('${CLASS}_filter_$field', {TAB}{TAB}{TAB}{TAB}NULL);{NEWLINE}"            >> "/tmp/adicli/$pid/FILTER_SEARCHS1.txt"
+      echo "{TAB}{TAB} TSession::setValue('${CLASS}_filter_$field', {TAB}{TAB}{TAB}{TAB}NULL);{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_SEARCHS1.txt"
 
       echo "{TAB}{TAB}if (isset(\$data->$field) AND (\$data->$field)) {{NEWLINE}
             {TAB}{TAB}{TAB}{TAB}\$filter = new TFilter('$field', '=', \"{\$data->$field}\");{NEWLINE}
             {TAB}{TAB}{TAB}{TAB}TSession::setValue('${CLASS}_filter_$field',   \$filter);{NEWLINE}
-            {TAB}{TAB}}{NEWLINE}{NEWLINE}"                                                                >> "/tmp/adicli/$pid/FILTER_SEARCHS2.txt"
+            {TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_SEARCHS2.txt"
 
       # SESSION_FILTERS
       echo "{TAB}{TAB}{TAB}{TAB}if (TSession::getValue('${CLASS}_filter_$field')) {{NEWLINE}
             {TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\$criteria->add(TSession::getValue('${CLASS}_filter_$field'));{NEWLINE}
-            {TAB}{TAB}{TAB}{TAB}}{NEWLINE}{NEWLINE}"                                                                >> "/tmp/adicli/$pid/SESSION_FILTERS.txt"
+            {TAB}{TAB}{TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/SESSION_FILTERS.txt"
 
-      field=$(echo "$field"|sed -e 's/(.*//g; s/ .*//g')
-      if [ "X$field" != "X" ] ; then
-        echo "{TAB}{TAB} parent::addAttribute('$field');"                      			                                >> "/tmp/adicli/$pid/DINAMIC_CODE.txt"
+      field=$(echo "$field" | sed -e 's/(.*//g; s/ .*//g')
+      if [ "X$field" != "X" ]; then
+        echo "{TAB}{TAB} parent::addAttribute('$field');" >>"/tmp/adicli/$pid/DINAMIC_CODE.txt"
       fi
-    
+
     done
 
   }
@@ -121,7 +119,7 @@ function generate() {
   # DINAMIC_CODE
   # ==============================================================================
   function DINAMIC_CODE() {
-    
+
     echo "{NEWLINE}{TAB} /\*\*{NEWLINE}"
     echo "{TAB} \* Constructor method{NEWLINE}"
     echo "{TAB} \*/{NEWLINE}"
@@ -133,7 +131,6 @@ function generate() {
     echo "{TAB}}"
     echo "{NEWLINE}"
   }
-
 
   # FORM_FIELDS
   # ==============================================================================
@@ -147,7 +144,7 @@ function generate() {
     echo "{NEWLINE}"
     echo "{TAB}{TAB} // add the fields"
     echo "{NEWLINE}"
-    cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt" 
+    cat "/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
     echo "{NEWLINE}"
   }
 
@@ -169,11 +166,11 @@ function generate() {
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FORM_FIELD_2.txt"
     echo "{NEWLINE}"
-  }    
+  }
 
   # LIST_COLUMNS
   # ==============================================================================
-  function LIST_COLUMNS () {
+  function LIST_COLUMNS() {
     echo "{NEWLINE}"
     echo "{TAB}{TAB} // creates the datagrid columns"
     echo "{NEWLINE}"
@@ -186,7 +183,6 @@ function generate() {
     cat "/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
     echo "{NEWLINE}"
   }
-
 
   # FILTER_FIELDS
   # ==============================================================================
@@ -201,9 +197,9 @@ function generate() {
   # FILTER_SEARCHS
   # ==============================================================================
   function FILTER_SEARCHS() {
-    cat "/tmp/adicli/$pid/FILTER_SEARCHS1.txt" >  "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+    cat "/tmp/adicli/$pid/FILTER_SEARCHS1.txt" >"/tmp/adicli/$pid/FILTER_SEARCHS.txt"
     echo "{NEWLINE}{NEWLINE}"
-    cat "/tmp/adicli/$pid/FILTER_SEARCHS2.txt" >> "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
+    cat "/tmp/adicli/$pid/FILTER_SEARCHS2.txt" >>"/tmp/adicli/$pid/FILTER_SEARCHS.txt"
 
     echo "{NEWLINE}"
     cat "/tmp/adicli/$pid/FILTER_SEARCHS.txt"
@@ -218,11 +214,9 @@ function generate() {
     cat "/tmp/adicli/$pid/SESSION_FILTERS.txt"
   }
 
-
   # Read the table for fields and types
   # ==============================================================================
   read_fields
-
 
   # Substitute MASKS on the template
   # ==============================================================================
@@ -231,13 +225,45 @@ function generate() {
   #s|; /|;\n|g;
   #s|^[$]|\n        $|g;
 
-  sed -e "
+  #  sed -e "
+  #    s|{AUTHOR}|${AUTHOR}|g;
+  #    s|{TABLENAME}|${TABLENAME}|g;
+  #    s|{PRIMARYKEY}|${PRIMARYKEY}|g;
+  #    s|{PRIMARY_KEY}|${PRIMARYKEY}|g;
+  #    s|{STRATEGY}|${STRATEGY}|g;
+  #    s|{DINAMIC_CODE}|$(echo -n `DINAMIC_CODE`)|g;
+  #    s|{CLASS}|${CLASS}|g;
+  #    s|{ACTIVE_RECORD}|${ACTIVE_RECORD}|g;
+  #    s|{DATABASE}|${DATABASE}|g;
+  #    s|{PARENT_CLASS}|${PARENT_CLASS}|g;
+  #    s|{EDIT_CLASS}|${EDIT_CLASS}|g;
+  #    s|##INIT_METHODS##|${INIT_METHODS}|g;
+  #    s|##FORM_SETUP##|${FORM_SETUP}|g;
+  #    s|##FORM_FIELDS##|$(echo -n `FORM_FIELDS`)|g;
+  #    s|##FORM_FIELD\[0\]##|$(echo -n `FORM_FIELD_0`)|g;
+  #    s|##FORM_FIELD\[1\]##|$(echo -n `FORM_FIELD_1`)|g;
+  #    s|##FORM_FIELD\[2\]##|$(echo -n `FORM_FIELD_2`)|g;
+  #    s|##FILTER_FIELDS##|$(echo -n `FILTER_FIELDS`)|g;
+  #    s|##FILTER_SEARCHS##|$(echo -n `FILTER_SEARCHS`)|g;
+  #    s|##SESSION_FILTERS##|$(echo -n `SESSION_FILTERS`)|g;
+  #    s|##LIST_COLUMNS##|$(echo -n `LIST_COLUMNS`)|g;
+  #    s|<your name here>|${AUTHOR}|g;
+  #    s|form_name_REPLACE_HERE|form_${ACTIVE_RECORD}Seek|g;
+  #    s|{ACTIVE_RECORD_LOWER}|${ACTIVE_RECORD_LOWER}|g;
+  #    s|{TAB}|   |g;
+  #    s|{LIMIT}|${LIMIT}|g;
+  #    s|{EDIT_ACTION}|${EDIT_ACTION}|g;
+  #    s|{NEWLINE}|\n|g;
+  #    s| parent::|\n        parent::|g;
+  #    " "$TEMPLATE"
+
+  sed -f /dev/stdin $TEMPLATE <<EOF
     s|{AUTHOR}|${AUTHOR}|g;
     s|{TABLENAME}|${TABLENAME}|g;
     s|{PRIMARYKEY}|${PRIMARYKEY}|g;
     s|{PRIMARY_KEY}|${PRIMARYKEY}|g;
     s|{STRATEGY}|${STRATEGY}|g;
-    s|{DINAMIC_CODE}|$(echo -n `DINAMIC_CODE`)|g;
+    s|{DINAMIC_CODE}|$(echo -n $(DINAMIC_CODE))|g;
     s|{CLASS}|${CLASS}|g;
     s|{ACTIVE_RECORD}|${ACTIVE_RECORD}|g;
     s|{DATABASE}|${DATABASE}|g;
@@ -245,14 +271,14 @@ function generate() {
     s|{EDIT_CLASS}|${EDIT_CLASS}|g;
     s|##INIT_METHODS##|${INIT_METHODS}|g;
     s|##FORM_SETUP##|${FORM_SETUP}|g;
-    s|##FORM_FIELDS##|$(echo -n `FORM_FIELDS`)|g;
-    s|##FORM_FIELD\[0\]##|$(echo -n `FORM_FIELD_0`)|g;
-    s|##FORM_FIELD\[1\]##|$(echo -n `FORM_FIELD_1`)|g;
-    s|##FORM_FIELD\[2\]##|$(echo -n `FORM_FIELD_2`)|g;
-    s|##FILTER_FIELDS##|$(echo -n `FILTER_FIELDS`)|g;
-    s|##FILTER_SEARCHS##|$(echo -n `FILTER_SEARCHS`)|g;
-    s|##SESSION_FILTERS##|$(echo -n `SESSION_FILTERS`)|g;
-    s|##LIST_COLUMNS##|$(echo -n `LIST_COLUMNS`)|g;
+    s|##FORM_FIELDS##|$(echo -n $(FORM_FIELDS))|g;
+    s|##FORM_FIELD\[0\]##|$(echo -n $(FORM_FIELD_0))|g;
+    s|##FORM_FIELD\[1\]##|$(echo -n $(FORM_FIELD_1))|g;
+    s|##FORM_FIELD\[2\]##|$(echo -n $(FORM_FIELD_2))|g;
+    s|##FILTER_FIELDS##|$(echo -n $(FILTER_FIELDS))|g;
+    s|##FILTER_SEARCHS##|$(echo -n $(FILTER_SEARCHS))|g;
+    s|##SESSION_FILTERS##|$(echo -n $(SESSION_FILTERS))|g;
+    s|##LIST_COLUMNS##|$(echo -n $(LIST_COLUMNS))|g;
     s|<your name here>|${AUTHOR}|g;
     s|form_name_REPLACE_HERE|form_${ACTIVE_RECORD}Seek|g;
     s|{ACTIVE_RECORD_LOWER}|${ACTIVE_RECORD_LOWER}|g;
@@ -261,10 +287,9 @@ function generate() {
     s|{EDIT_ACTION}|${EDIT_ACTION}|g;
     s|{NEWLINE}|\n|g;
     s| parent::|\n        parent::|g; 
-    " "$TEMPLATE"
+EOF
 
 }
-
 
 ##INIT_METHODS##
 ##FORM_SETUP##
@@ -311,23 +336,22 @@ function generate() {
 ##TITLES##
 # ==============================================================================
 
-
 # Show tables
 # ==============================================================================
 function show_tables() {
 
-  source $conf_file || { 
+  source $conf_file || {
     echo "conf_file ($conf_file) not found."
     exit 4
   }
 
   source $conf_db_engine || {
     echo "conf_db_engine ($conf__db_engine) not found."
-    exit 5    
+    exit 5
   }
 
   # show tables
-  echo "$show_tables"|$db_connector
+  echo "$show_tables" | $db_connector
 
 }
 
@@ -335,16 +359,15 @@ function show_tables() {
 # ==============================================================================
 function show_templates() {
   cd /usr/share/adicli/framework/templates/ || exit
-  find /usr/share/adicli/framework/templates|grep .php$
+  find /usr/share/adicli/framework/templates | grep .php$
   echo
   exit 1
 }
 
-
 # Show Examples
 # ==============================================================================
 function show_examples() {
-cat <<EOF
+  cat <<EOF
 How to Use
 ==========
 
@@ -383,30 +406,27 @@ Create a Customers List
 EOF
 }
 
-
-
-
 # List Options or Generate the Class
 # ==============================================================================
 case $option in
-  "templates")
-    show_templates
-    exit
-    ;;
+"templates")
+  show_templates
+  exit
+  ;;
 
-  "examples")
-    show_examples
-    exit
-    ;;
+"examples")
+  show_examples
+  exit
+  ;;
 
-  "tables")
-    show_tables
-    exit
-    ;;
-    
-  *)
-    generate
-    ;;    
+"tables")
+  show_tables
+  exit
+  ;;
+
+*)
+  generate
+  ;;
 esac
 
 # Clean files
