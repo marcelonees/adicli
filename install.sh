@@ -25,11 +25,11 @@ mkdir -p /usr/share/adicli
 
 cp -R -f etc/adicli/*       /etc/adicli/
 cp -R -f usr/share/adicli/* /usr/share/adicli/
-cp    -f usr/bin/adicli     /usr/bin/
+cp    -f usr/bin/adicli*    /usr/bin/
 
 chown -R root:root /etc/adicli /usr/share/adicli/
-chmod -R 755 /etc/adicli/      /usr/share/adicli/ /usr/bin/adicli
-chmod +x /usr/bin/adicli
+chmod -R 755 /etc/adicli/      /usr/share/adicli/ /usr/bin/adicli*
+chmod +x /usr/bin/adicli*
 
 
 # adicli successfully installed
