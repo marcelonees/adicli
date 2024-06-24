@@ -25,7 +25,7 @@ mkdir -p /usr/share/adicli
 
 if [ ! -f /etc/adicli/adicli.conf ] ; then
 
-cat <<EOF >/etc/adicli/adicli.conf
+cat <<EOF>/etc/adicli/adicli.conf
 #!/bin/bash
 
 template_model="/usr/share/adicli/framework/templates/model/Model.php"
@@ -33,6 +33,7 @@ template_list="/usr/share/adicli/framework/templates/list/CompleteList.php"
 template_form="/usr/share/adicli/framework/templates/form/CompleteForm.php"
 
 EOF
+fi
 
 cp -R -f etc/adicli/*       /etc/adicli/
 cp -R -f usr/share/adicli/* /usr/share/adicli/
