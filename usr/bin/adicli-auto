@@ -21,8 +21,8 @@ fi
 . /etc/adicli/adicli.conf
 
 template_model=${template_model:-"/usr/share/adicli/framework/templates/model/Model.php"}
-template_list=${template_model:-"/usr/share/adicli/framework/templates/list/CompleteList.php"}
-template_form=${template_model:-"/usr/share/adicli/framework/templates/form/CompleteForm.php"}
+template_list=${template_list:-"/usr/share/adicli/framework/templates/list/CompleteList.php"}
+template_form=${template_form:-"/usr/share/adicli/framework/templates/form/CompleteForm.php"}
 
 echo 
 echo "ATENÇÂO! Este comando irá criar os arquivos dentro dos diretórios app/control/$database/$table/ e app/model/$database/$table/"
