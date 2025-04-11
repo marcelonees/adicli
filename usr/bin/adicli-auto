@@ -9,13 +9,13 @@ table=$2
 model=$3
 
 function infobox() {
-   echo "Uso: $0 database table model"
-   echo "Ex: $0 vigsan_fisc legislacao VigSanFiscLegislacao"
-   exit 1
+       echo "Uso: $0 database table model"
+       echo "Ex: $0 vigsan_fisc legislacao VigSanFiscLegislacao"
+       exit 1
 }
 
 if [ "X${database}" == "X" ] || [ "X${table}" == "X" ] || [ "X${model}" == "X" ]; then
-  infobox
+       infobox
 fi
 
 . /etc/adicli/adicli.conf
@@ -24,10 +24,16 @@ template_model=${template_model:-"/usr/share/adicli/framework/templates/model/Mo
 template_list=${template_list:-"/usr/share/adicli/framework/templates/list/CompleteList.php"}
 template_form=${template_form:-"/usr/share/adicli/framework/templates/form/CompleteForm.php"}
 
-echo 
+# Verifica se está no diretório raiz da aplicação
+if [ ! -d "app/control" ] && [ ! -d "app/model" ]; then
+       echo 'Erro: Você precisa estar no diretório raiz da aplicação.'
+       exit
+fi
+
+echo
 echo "ATENÇÂO! Este comando irá criar os arquivos dentro dos diretórios app/control/$database/$table/ e app/model/$database/$table/"
 echo "Aperte ENTER para continuar ou CTRL+C para cancelar"
-echo 
+echo
 read x
 
 mkdir -p app/model/$database/$table/
@@ -36,16 +42,14 @@ mkdir -p app/control/$database/$table/
 # Cria o modelo
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model} -T $template_model > app/model/$database/$table/$model.class.php
+       -t $table -M $model -C ${model} -T $template_model >app/model/$database/$table/$model.class.php
 
 # Cria o arquivo de listagem
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model}List -T $template_list > app/control/$database/$table/${model}List.class.php
+       -t $table -M $model -C ${model}List -T $template_list >app/control/$database/$table/${model}List.class.php
 
 # Cria o form
 adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
-       -t $table -M $model -C ${model}Form -T $template_form > app/control/$database/$table/${model}Form.class.php
-
-
+       -t $table -M $model -C ${model}Form -T $template_form >app/control/$database/$table/${model}Form.class.php
