@@ -6,8 +6,8 @@
 #
 # ==============================================================================
 
-conf_header=/usr/share/adicli/base/header
-conf_db_engine=/usr/share/adicli/base/db_engine
+conf_header=${conf_header:-"/usr/share/adicli/base/header"}
+conf_db_engine=${conf_db_engine:-"/usr/share/adicli/base/db_engine"}
 
 if [ ! -e $conf_header ] || [ ! -e $conf_db_engine ]; then
 
@@ -214,6 +214,152 @@ function generate() {
     cat "/tmp/adicli/$pid/SESSION_FILTERS.txt"
   }
 
+  # SWAGGER_FIELDS_YAML
+  # ==============================================================================
+  function SWAGGER_FIELDS_YAML() {
+    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+    
+    # Reusa a leitura dos campos, mas precisa ser chamada antes
+    # Esta função será chamada após read_fields já ter sido executada
+    
+    # Lê os campos do arquivo temporário que foi criado durante read_fields
+    # Como não temos acesso direto aos campos lidos, vamos processar novamente
+    # mas usando a mesma lógica do read_fields
+    
+    # Salva o comando original do db_command
+    local original_db_command="$db_command"
+    
+    # Executa a consulta novamente para pegar os campos
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1, $2}' | while read field type; do
+      
+      # Limpa o tipo
+      type=$(echo "$type" | sed -e 's/(.*//g;')
+      
+      # Determina o tipo Swagger
+      case $type in
+        int|tinyint|smallint|mediumint|bigint|integer)
+          swagger_type="integer"
+          ;;
+        float|double|decimal)
+          swagger_type="number"
+          ;;
+        enum)
+          swagger_type="string"
+          # Para enum, precisaríamos extrair os valores, mas isso é complexo
+          # Vamos deixar como string por enquanto
+          ;;
+        date)
+          swagger_type="string"
+          swagger_format="date"
+          ;;
+        datetime|timestamp)
+          swagger_type="string"
+          swagger_format="date-time"
+          ;;
+        time)
+          swagger_type="string"
+          swagger_format="time"
+          ;;
+        year)
+          swagger_type="string"
+          swagger_format="year"
+          ;;
+        text|tinytext|mediumtext|longtext|varchar|char)
+          swagger_type="string"
+          ;;
+        boolean|bool)
+          swagger_type="boolean"
+          ;;
+        *)
+          swagger_type="string"
+          ;;
+      esac
+      
+      # Verifica se o campo permite nulo (isso requereria info adicional)
+      # Por enquanto, vamos assumir nullable: false como padrão
+      
+      # Escreve no formato YAML
+      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}$field:"                           >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}type: $swagger_type"          >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+      
+      # Adiciona format se existir
+      if [ ! -z "$swagger_format" ]; then
+        echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}format: $swagger_format"    >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+        unset swagger_format
+      fi
+      
+      # Adiciona nullable: false como padrão
+      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}nullable: false"              >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+      echo ""                                                               >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+    done
+    
+    # Restaura o comando original
+    db_command="$original_db_command"
+    
+    # Retorna o conteúdo
+    cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+  }
+
+  # SWAGGER_FIELDS_YAML_EXAMPLE
+  # ==============================================================================
+  function SWAGGER_FIELDS_YAML_EXAMPLE() {
+    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+    
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1}' | while read field; do
+      
+      # Determina um exemplo baseado no nome do campo
+      case $field in
+        *id|*cod*|*num*)
+          example="12"
+          ;;
+        *nome*|*desc*|*titulo*|*texto*)
+          example='\"Some value\"'
+          ;;
+        *data*|*date*)
+          example='\"2021-10-12\"'
+          ;;
+        *hora*|*time*)
+          example='\"13:44\"'
+          ;;
+        *datetime*|*timestamp*)
+          example='\"2021-10-12 13:44\"'
+          ;;
+        *bool*|*flag*|*ativo*|*status*)
+          example="true"
+          ;;
+        *sim*|*nao*|*concluida*)
+          example="'S'"
+          ;;
+        *)
+          example='\"Some value\"'
+          ;;
+      esac
+      
+      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+    done
+    
+    cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+  }
+
+  # SWAGGER_FIELDS_YAML_REQUIRED
+  # ==============================================================================
+  function SWAGGER_FIELDS_YAML_REQUIRED() {
+    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_REQUIRED.txt"
+    
+    local first=true
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1}' | while read field; do
+      if [ "$first" = true ]; then
+        echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}- $field" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_REQUIRED.txt"
+        first=false
+      else
+        echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}- $field" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_REQUIRED.txt"
+      fi
+    done
+    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_REQUIRED.txt"
+    
+    cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_REQUIRED.txt"
+  }
+
   # Read the table for fields and types
   # ==============================================================================
   read_fields
@@ -279,6 +425,9 @@ function generate() {
     s|##FILTER_SEARCHS##|$(echo -n $(FILTER_SEARCHS))|g;
     s|##SESSION_FILTERS##|$(echo -n $(SESSION_FILTERS))|g;
     s|##LIST_COLUMNS##|$(echo -n $(LIST_COLUMNS))|g;
+    s|##SWAGGER_FIELDS_YAML##|$(echo -n $(SWAGGER_FIELDS_YAML))|g;
+    s|##SWAGGER_FIELDS_YAML_EXAMPLE##|$(echo -n $(SWAGGER_FIELDS_YAML_EXAMPLE))|g;
+    s|##SWAGGER_FIELDS_YAML_REQUIRED##|$(echo -n $(SWAGGER_FIELDS_YAML_REQUIRED))|g;
     s|<your name here>|${AUTHOR}|g;
     s|form_name_REPLACE_HERE|form_${ACTIVE_RECORD}Seek|g;
     s|{ACTIVE_RECORD_LOWER}|${ACTIVE_RECORD_LOWER}|g;
@@ -372,7 +521,7 @@ How to Use
 ==========
 
 Create a Customers Model
-========================
+===================================================
 
   adicli -c /etc/adicli/databases/mysql.conf  \\
          -T /usr/share/adicli/framework/templates/model/Model.php \\
@@ -383,7 +532,7 @@ Create a Customers Model
 
 
 Create a Customers Form
-========================
+===================================================
 
   adicli -c /etc/adicli/databases/mysql.conf  \\
          -T /usr/share/adicli/framework/templates/form/StandardForm.php \\
@@ -394,7 +543,7 @@ Create a Customers Form
 
 
 Create a Customers List
-========================
+===================================================
 
   adicli -c /etc/adicli/databases/mysql.conf  \\
          -T /usr/share/adicli/framework/templates/list/StandardList.php \\
@@ -402,6 +551,25 @@ Create a Customers List
          -t customers \\
          -M Customers \\
          -C CustomersList > CustomersList.class.php
+
+Create a rest service for Customers
+===================================================
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/service/rest/SecureRestService.php \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C CustomersRestService > CustomersRestService.class.php
+
+
+Create a documentation for Customers rest service
+===================================================
+  adicli -c /etc/adicli/databases/mysql.conf  \\
+         -T /usr/share/adicli/framework/templates/swagger/ApiDoc.yaml \\
+         -A "Full Name <your_email@domain" \\
+         -t customers \\
+         -M Customers \\
+         -C Customers > Customers.yaml
 
 EOF
 }

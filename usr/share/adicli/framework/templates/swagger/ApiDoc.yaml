@@ -1,0 +1,225 @@
+openapi: 3.0.0
+info:
+  title: API de Cadastro de {ACTIVE_RECORD}
+  description: |-
+    API para gerenciamento de informações de {ACTIVE_RECORD}
+
+    ## ⚠️ AVISOS IMPORTANTES
+    - **Métodos não disponíveis:** PATCH e PUT
+    - **Autenticação obrigatória:** Use o header `Authorization: Bearer {token}`
+    - **Obtenha seu token** em `/auth` (documentação disponível [aqui](?url=auth%2Fauth.yaml#/Autenticação))
+
+  version: 1.0.0
+
+# Adicione esta seção para segurança global (opcional)
+# security:
+#   - bearerAuth: []
+
+paths:
+  /api/{ACTIVE_RECORD}:
+    get:
+      summary: Listar todos os {ACTIVE_RECORD}
+      description: |- 
+        Retorna uma lista paginada com todos os {ACTIVE_RECORD} cadastrados
+
+        **Exemplo**
+        ```bash
+        curl -X GET "https://sistemas.jaraguadosul.sc.gov.br/api/{ACTIVE_RECORD}?offset=1&limit=10" \
+          -H "Authorization: Bearer SEU_TOKEN_AQUI"
+        ```        
+      parameters:
+        - name: offset
+          in: query
+          description: Número da página
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Quantidade de itens por página
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de {ACTIVE_RECORD} retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{ACTIVE_RECORD}ListResponse'
+        '401':
+          description: Não autorizado
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          description: Erro interno do servidor
+    post:
+      summary: Criar um novo {ACTIVE_RECORD}
+      description: |-
+        Cadastra um novo {ACTIVE_RECORD} no sistema
+
+        **Exemplo**
+        ```bash
+        curl -X POST "https://sistemas.jaraguadosul.sc.gov.br/api/{ACTIVE_RECORD}" \
+          -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+          -H "Content-Type: application/json" \
+          -d '
+            {
+              ##SWAGGER_FIELDS_YAML_EXAMPLE##
+            }
+          '
+        ```        
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/{ACTIVE_RECORD}Input'
+      responses:
+        '200':
+          description: {ACTIVE_RECORD} criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{ACTIVE_RECORD}SuccessResponse'
+              example:
+                status: success
+                data: ##SWAGGER_FIELDS_YAML_EXAMPLE##
+        '400':
+          description: Dados inválidos fornecidos
+        '401':
+          description: Não autorizado
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          description: Erro interno do servidor
+  /api/{ACTIVE_RECORD}/{id}:
+    get:
+      summary: Obter detalhes de um {ACTIVE_RECORD}
+      description: |-
+        Retorna informações detalhadas sobre um {ACTIVE_RECORD} específico
+
+        **Exemplo**
+        ```bash
+        curl -X GET "https://sistemas.jaraguadosul.sc.gov.br/api/{ACTIVE_RECORD}/12" \
+          -H "Authorization: Bearer SEU_TOKEN_AQUI"
+        ```
+      parameters:
+        - name: id
+          in: path
+          description: ID do {ACTIVE_RECORD}
+          required: true
+          schema:
+            type: integer
+            example: 4
+      responses:
+        '200':
+          description: Dados do {ACTIVE_RECORD} retornados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{ACTIVE_RECORD}SuccessResponse'
+        '401':
+          description: Não autorizado
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: {ACTIVE_RECORD} não encontrado
+        '500':
+          description: Erro interno do servidor
+    delete:
+      summary: Excluir um {ACTIVE_RECORD}
+      description: |-
+        Remove um {ACTIVE_RECORD} do sistema
+
+        **Exemplo**
+        ```bash
+        curl -X DELETE "https://sistemas.jaraguadosul.sc.gov.br/api/{ACTIVE_RECORD}/12" \
+          -H "Authorization: Bearer SEU_TOKEN_AQUI"
+        ````
+      parameters:
+        - name: id
+          in: path
+          description: ID do {ACTIVE_RECORD}
+          required: true
+          schema:
+            type: integer
+            example: 4
+      responses:
+        '200':
+          description: {ACTIVE_RECORD} excluído com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: {ACTIVE_RECORD} excluído com sucesso
+        '401':
+          description: Não autorizado                    
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: {ACTIVE_RECORD} não encontrado
+        '500':
+          description: Erro interno do servidor
+components:
+  schemas:
+    {ACTIVE_RECORD}SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties: ##SWAGGER_FIELDS_YAML##
+    {ACTIVE_RECORD}ListResponse:
+      type: object
+      properties:
+        offset:
+          type: string
+          example: "0"
+        limit:
+          type: string
+          example: "10"
+        total:
+          type: integer
+          example: 1
+        hasNext:
+          type: boolean
+          example: false      
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/{ACTIVE_RECORD}'
+
+    {ACTIVE_RECORD}Input:
+      type: object
+      properties: ##SWAGGER_FIELDS_YAML##
+    {ACTIVE_RECORD}:
+      type: object
+      properties: ##SWAGGER_FIELDS_YAML##
+      required: ##SWAGGER_FIELDS_YAML_REQUIRED##
+  # Esquema de segurança
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # Opcional, pode ser removido se não usar JWT
+      description: Insira o token JWT no formato 'Bearer <token>'  
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+# Segurança global
+security:
+  - bearerAuth: []

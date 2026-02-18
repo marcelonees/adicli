@@ -31,6 +31,8 @@ cat <<EOF>/etc/adicli/adicli.conf
 template_model="/usr/share/adicli/framework/templates/model/Model.php"
 template_list="/usr/share/adicli/framework/templates/list/CompleteList.php"
 template_form="/usr/share/adicli/framework/templates/form/CompleteForm.php"
+template_swagger="/usr/share/adicli/framework/templates/swagger/ApiDoc.yaml"
+template_rest="/usr/share/adicli/framework/templates/service/rest/StandardRestService.php"
 
 EOF
 fi

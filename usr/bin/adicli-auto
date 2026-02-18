@@ -1,8 +1,6 @@
 #!/bin/bash
-
-#database=vigsan_fisc
-#table=legislacao
-#model=VigSanFiscLegislacao
+# Script para criar os arquivos de modelo, listagem e formulário para uma tabela específica
+# Autor: Marcelo Barreto Nees <marcelo.linux@gmail.com>
 
 database=$1
 table=$2
@@ -23,6 +21,12 @@ fi
 template_model=${template_model:-"/usr/share/adicli/framework/templates/model/Model.php"}
 template_list=${template_list:-"/usr/share/adicli/framework/templates/list/CompleteList.php"}
 template_form=${template_form:-"/usr/share/adicli/framework/templates/form/CompleteForm.php"}
+template_swagger=${template_swagger:-"/usr/share/adicli/framework/templates/swagger/ApiDoc.yaml"}
+template_rest=${template_rest:-"/usr/share/adicli/framework/templates/service/rest/StandardRestService.php"}
+author=${author:-"Autor <email>"}
+generate_rest=${generate_rest:-"n"}
+generate_swagger=${generate_swagger:-"n"}
+adicli=${adicli:-"adicli"}
 
 # Verifica se está no diretório raiz da aplicação
 if [ ! -d "app/control" ] && [ ! -d "app/model" ]; then
@@ -30,26 +34,77 @@ if [ ! -d "app/control" ] && [ ! -d "app/model" ]; then
        exit
 fi
 
+
 echo
 echo "ATENÇÂO! Este comando irá criar os arquivos dentro dos diretórios app/control/$database/$table/ e app/model/$database/$table/"
 echo "Aperte ENTER para continuar ou CTRL+C para cancelar"
 echo
 read x
 
+
+cat <<EOF
+
+                  A D I C L I
+
+Adianti Command Line Interface - Auto Generation
+
+
+
+Database.............................: $database
+Table................................: $table
+Model................................: $model
+Template do Modelo...................: $template_model
+Template da Listagem.................: $template_list
+Template do Formulário...............: $template_form
+Template do Swagger..................: $template_swagger
+Template do Serviço REST.............: $template_rest
+Autor................................: $author
+Gerar serviço REST? (y/n)............: $generate_rest
+Gerar documentação do Swagger? (y/n).: $generate_swagger
+
+EOF
+
+# exit
+
 mkdir -p app/model/$database/$table/
 mkdir -p app/control/$database/$table/
 
 # Cria o modelo
-adicli -c /etc/adicli/databases/$database.conf \
+$adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
        -t $table -M $model -C ${model} -T $template_model >app/model/$database/$table/$model.class.php
 
 # Cria o arquivo de listagem
-adicli -c /etc/adicli/databases/$database.conf \
+$adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
        -t $table -M $model -C ${model}List -T $template_list >app/control/$database/$table/${model}List.class.php
 
 # Cria o form
-adicli -c /etc/adicli/databases/$database.conf \
+$adicli -c /etc/adicli/databases/$database.conf \
        -A "Marcelo Barreto Nees <marcelo.linux@gmail.com>" \
        -t $table -M $model -C ${model}Form -T $template_form >app/control/$database/$table/${model}Form.class.php
+
+# Verifica se o usuário deseja criar o serviço REST
+if [ "X$generate_rest" == 'Xy' ] || [ "X$generate_rest" == 'XY' ]; then
+       # Cria o diretório do serviço REST
+       mkdir -p "app/service/rest/$database/$table/"
+
+       # Cria o serviço REST
+       $adicli -c /etc/adicli/databases/$database.conf \
+              -A "$author" \
+              -t $table -M $model -C ${model}RestService -T $template_rest >app/service/rest/$database/$table/${model}RestService.class.php
+fi
+
+# Verifica se o usuário deseja criar a documentação do Swagger
+if [ "X$generate_swagger" == 'Xy' ] || [ "X$generate_swagger" == 'XY' ]; then
+       # Cria o diretório do swagger
+       mkdir -p "docs/api/$database/$table/"
+
+       # Cria o arquivo de documentação do Swagger
+       $adicli -c /etc/adicli/databases/$database.conf \
+              -A "$author" \
+              -t $table -M $model -C ${model} -T $template_swagger >docs/api/$database/$table/${model}.yaml
+
+       echo "Arquivo de documentação do Swagger criado em docs/api/$database/$table/${model}.yaml"              
+       echo "Lembre-se de revisar o arquivo para ajustar os detalhes específicos do endpoint, como parâmetros, exemplos e descrições."
+fi
