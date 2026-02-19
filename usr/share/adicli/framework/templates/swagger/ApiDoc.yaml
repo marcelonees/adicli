@@ -65,9 +65,8 @@ paths:
           -H "Authorization: Bearer SEU_TOKEN_AQUI" \
           -H "Content-Type: application/json" \
           -d '
-            {
-              ##SWAGGER_FIELDS_YAML_EXAMPLE##
-            }
+              {##SWAGGER_FIELDS_YAML_EXAMPLE##
+              }
           '
         ```        
       requestBody:

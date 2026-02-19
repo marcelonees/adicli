@@ -305,6 +305,8 @@ function generate() {
   function SWAGGER_FIELDS_YAML_EXAMPLE() {
     echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
     
+    first=true
+    
     echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1}' | while read field; do
       
       # Determina um exemplo baseado no nome do campo
@@ -335,8 +337,17 @@ function generate() {
           ;;
       esac
       
-      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+      # Se não for o primeiro campo, adiciona vírgula no final da linha anterior
+      if [ "$first" = true ]; then
+        first=false
+        echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example"  >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+      else
+        echo -n ",{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+      fi
     done
+    
+    # Adiciona uma quebra de linha no final
+    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
     
     cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
   }
@@ -366,43 +377,6 @@ function generate() {
 
   # Substitute MASKS on the template
   # ==============================================================================
-  #s|parent::|      parent::|g;
-  #s|; parent::|;\n      parent::|g;
-  #s|; /|;\n|g;
-  #s|^[$]|\n        $|g;
-
-  #  sed -e "
-  #    s|{AUTHOR}|${AUTHOR}|g;
-  #    s|{TABLENAME}|${TABLENAME}|g;
-  #    s|{PRIMARYKEY}|${PRIMARYKEY}|g;
-  #    s|{PRIMARY_KEY}|${PRIMARYKEY}|g;
-  #    s|{STRATEGY}|${STRATEGY}|g;
-  #    s|{DINAMIC_CODE}|$(echo -n `DINAMIC_CODE`)|g;
-  #    s|{CLASS}|${CLASS}|g;
-  #    s|{ACTIVE_RECORD}|${ACTIVE_RECORD}|g;
-  #    s|{DATABASE}|${DATABASE}|g;
-  #    s|{PARENT_CLASS}|${PARENT_CLASS}|g;
-  #    s|{EDIT_CLASS}|${EDIT_CLASS}|g;
-  #    s|##INIT_METHODS##|${INIT_METHODS}|g;
-  #    s|##FORM_SETUP##|${FORM_SETUP}|g;
-  #    s|##FORM_FIELDS##|$(echo -n `FORM_FIELDS`)|g;
-  #    s|##FORM_FIELD\[0\]##|$(echo -n `FORM_FIELD_0`)|g;
-  #    s|##FORM_FIELD\[1\]##|$(echo -n `FORM_FIELD_1`)|g;
-  #    s|##FORM_FIELD\[2\]##|$(echo -n `FORM_FIELD_2`)|g;
-  #    s|##FILTER_FIELDS##|$(echo -n `FILTER_FIELDS`)|g;
-  #    s|##FILTER_SEARCHS##|$(echo -n `FILTER_SEARCHS`)|g;
-  #    s|##SESSION_FILTERS##|$(echo -n `SESSION_FILTERS`)|g;
-  #    s|##LIST_COLUMNS##|$(echo -n `LIST_COLUMNS`)|g;
-  #    s|<your name here>|${AUTHOR}|g;
-  #    s|form_name_REPLACE_HERE|form_${ACTIVE_RECORD}Seek|g;
-  #    s|{ACTIVE_RECORD_LOWER}|${ACTIVE_RECORD_LOWER}|g;
-  #    s|{TAB}|   |g;
-  #    s|{LIMIT}|${LIMIT}|g;
-  #    s|{EDIT_ACTION}|${EDIT_ACTION}|g;
-  #    s|{NEWLINE}|\n|g;
-  #    s| parent::|\n        parent::|g;
-  #    " "$TEMPLATE"
-
   sed -f /dev/stdin $TEMPLATE <<EOF
     s|{AUTHOR}|${AUTHOR}|g;
     s|{TABLENAME}|${TABLENAME}|g;
