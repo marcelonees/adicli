@@ -67,7 +67,7 @@ paths:
           -d '
               {##SWAGGER_FIELDS_YAML_EXAMPLE##
               }
-          '
+             '
         ```        
       requestBody:
         required: true
@@ -84,7 +84,7 @@ paths:
                 $ref: '#/components/schemas/{ACTIVE_RECORD}SuccessResponse'
               example:
                 status: success
-                data: ##SWAGGER_FIELDS_YAML_EXAMPLE##
+                data: ##SWAGGER_FIELDS_YAML_DATA##
         '400':
           description: Dados inválidos fornecidos
         '401':
