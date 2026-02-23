@@ -59,10 +59,23 @@ function generate() {
     echo "" >>"/tmp/adicli/$pid/FILTER_SEARCHS.txt"
     echo "" >>"/tmp/adicli/$pid/SESSION_FILTERS.txt"
 
-    #echo "$db_command"|$db_connector|grep -E -v '^( |$|CONSTRAINT)'|awk '{print $1,$2}'|while read field type; do
+    # debug - salva a saída completa
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' > "/tmp/adicli/$pid/debug_raw.txt"
+
+    # debug
+    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' > "/tmp/adicli/$pid/debug.txt"
+    
+    # Loop
     echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1, $2}' | while read field type; do
 
+      echo "${field}: ${type}" >> "/tmp/adicli/$pid/debug.txt"
+
+      original_type="$type"
       type=$(echo "$type" | sed -e 's/(.*//g;')
+
+      # Inicializa variáveis para ENUM
+      enum_values=""
+      enum_labels=""
 
       case $type in
       varchar)
@@ -73,43 +86,89 @@ function generate() {
         type_adianti="TDate"
         ;;
 
+      enum)
+        type_adianti="TRadioGroup"
+        # Extrai os valores do ENUM: enum('M','A','T') -> M A T
+        enum_values=$(echo "$original_type" | sed -e "s/enum(//g; s/)//g; s/'//g; s/,/ /g")
+        
+        # Cria um array associativo com valores e labels
+        # Por padrão, usa o próprio valor como label
+        # Mas você pode personalizar depois no template
+        enum_labels=""
+        for value in $enum_values; do
+            if [ -z "$enum_labels" ]; then
+                enum_labels="['$value' => '$value'"
+            else
+                enum_labels="$enum_labels, '$value' => '$value'"
+            fi
+        done
+        enum_labels="$enum_labels]"
+        
+        # Salva as informações do ENUM em arquivos separados
+        echo "$field:$enum_values" >> "/tmp/adicli/$pid/ENUM_VALUES.txt"
+        echo "$field:$enum_labels" >> "/tmp/adicli/$pid/ENUM_LABELS.txt"
+        ;;
+
       *)
         type_adianti="TEntry"
         ;;
       esac
 
-      # FORM_FIELDS_{Objects,Fields}
-      echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      # FORM_FIELDS_{Objects,Fields} - modificado para incluir configuração do RadioGroup
+      if [ "$type" = "enum" ]; then
+          # Para ENUM, adiciona a configuração do RadioGroup
+          echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+          echo "{TAB}{TAB} \$$field->addItems($enum_labels);{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+          echo "{TAB}{TAB} \$$field->setUseButton();{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+          echo "{TAB}{TAB} \$$field->setLayout('horizontal');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      else
+          echo "{TAB}{TAB} \$$field = new $type_adianti('$field');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Objects.txt"
+      fi
+      
       echo "{TAB}{TAB} \$this->form->addFields( [ new TLabel('$field')] , [ \$$field ] );{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELDS_Fields.txt"
 
-      # FORM_FIELD_{0,1,2}
-      echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_0.txt"
-      echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_1.txt"
-      echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_2.txt"
+      # FORM_FIELD_{0,1,2} - para exibição dos detalhes
+      if [ "$type" = "enum" ]; then
+          # Para exibição de ENUM, podemos mostrar o valor ou criar um label mais amigável
+          echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_0.txt"
+          echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_1.txt"
+          echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_2.txt"
+      else
+          echo "{TAB}{TAB}{TAB} \$label_$field = new TLabel('$field', '#333333', '', 'B');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_0.txt"
+          echo "{TAB}{TAB}{TAB} \$text_$field = new TTextDisplay(\$object->$field, '#333333', '', '');{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_1.txt"
+          echo "{TAB}{TAB}{TAB} \$this->form->addFields([\$label_$field],[\$text_$field]);{NEWLINE}" >>"/tmp/adicli/$pid/FORM_FIELD_2.txt"
+      fi
 
       # LIST_COLUMNS_{Objects,Fields}
       echo "{TAB}{TAB} \$column_$field = new TDataGridColumn('$field', '$field', 'left');{NEWLINE}" >>"/tmp/adicli/$pid/LIST_COLUMNS_Objects.txt"
       echo "{TAB}{TAB} \$this->datagrid->addColumn(\$column_$field);{NEWLINE}" >>"/tmp/adicli/$pid/LIST_COLUMNS_Fields.txt"
 
-      # FILTER_FIELDS
-      echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+      # FILTER_FIELDS - para ENUM, podemos querer um combo box em vez de input text
+      if [ "$type" = "enum" ]; then
+          echo "{TAB}{TAB}"                                                                   >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+          echo "{TAB}{TAB} \$this->form->addField('$field', new TCombo('$field'));{NEWLINE}"  >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+          echo "{TAB}{TAB} \$${field}_combo = \$this->form->getField('$field');{NEWLINE}"     >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+          echo "{TAB}{TAB} \$${field}_combo->addItems($enum_labels);{NEWLINE}"                >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+      else
+          echo "{TAB}{TAB} \$this->addFilterField('$field', '=', '$field');{NEWLINE}"         >>"/tmp/adicli/$pid/FILTER_FIELDS.txt"
+      fi
 
       # FILTER_SEARCHS
       echo "{TAB}{TAB} TSession::setValue('${CLASS}_filter_$field', {TAB}{TAB}{TAB}{TAB}NULL);{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_SEARCHS1.txt"
 
       echo "{TAB}{TAB}if (isset(\$data->$field) AND (\$data->$field)) {{NEWLINE}
-            {TAB}{TAB}{TAB}{TAB}\$filter = new TFilter('$field', '=', \"{\$data->$field}\");{NEWLINE}
-            {TAB}{TAB}{TAB}{TAB}TSession::setValue('${CLASS}_filter_$field',   \$filter);{NEWLINE}
-            {TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_SEARCHS2.txt"
+          {TAB}{TAB}{TAB}{TAB}\$filter = new TFilter('$field', '=', \"{\$data->$field}\");{NEWLINE}
+          {TAB}{TAB}{TAB}{TAB}TSession::setValue('${CLASS}_filter_$field',   \$filter);{NEWLINE}
+          {TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/FILTER_SEARCHS2.txt"
 
       # SESSION_FILTERS
       echo "{TAB}{TAB}{TAB}{TAB}if (TSession::getValue('${CLASS}_filter_$field')) {{NEWLINE}
-            {TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\$criteria->add(TSession::getValue('${CLASS}_filter_$field'));{NEWLINE}
-            {TAB}{TAB}{TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/SESSION_FILTERS.txt"
+          {TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\$criteria->add(TSession::getValue('${CLASS}_filter_$field'));{NEWLINE}
+          {TAB}{TAB}{TAB}{TAB}}{NEWLINE}{NEWLINE}" >>"/tmp/adicli/$pid/SESSION_FILTERS.txt"
 
       field=$(echo "$field" | sed -e 's/(.*//g; s/ .*//g')
       if [ "X$field" != "X" ]; then
-        echo "{TAB}{TAB} parent::addAttribute('$field');" >>"/tmp/adicli/$pid/DINAMIC_CODE.txt"
+          echo "{TAB}{TAB} parent::addAttribute('$field');" >>"/tmp/adicli/$pid/DINAMIC_CODE.txt"
       fi
 
     done
@@ -217,139 +276,243 @@ function generate() {
   # SWAGGER_FIELDS_YAML
   # ==============================================================================
   function SWAGGER_FIELDS_YAML() {
-    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-    
-    # Reusa a leitura dos campos, mas precisa ser chamada antes
-    # Esta função será chamada após read_fields já ter sido executada
-    
-    # Lê os campos do arquivo temporário que foi criado durante read_fields
-    # Como não temos acesso direto aos campos lidos, vamos processar novamente
-    # mas usando a mesma lógica do read_fields
-    
-    # Salva o comando original do db_command
-    local original_db_command="$db_command"
-    
-    # Executa a consulta novamente para pegar os campos
-    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1, $2}' | while read field type; do
+      echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
       
-      # Limpa o tipo
-      type=$(echo "$type" | sed -e 's/(.*//g;')
+      while IFS= read -r line; do
+          # Pula linhas vazias ou de CONSTRAINT
+          echo "$line" | grep -E -q '^($|CONSTRAINT)' && continue
+          
+          # Extrai o campo (primeira coluna)
+          field=$(echo "$line" | awk '{print $1}')
+          
+          # Extrai o tipo completo (restante da linha)
+          full_type=$(echo "$line" | awk '{$1=""; print $0}' | sed -e 's/^[ \t]*//')
+          
+          # Extrai APENAS a definição do tipo (primeira palavra após o campo)
+          type_definition=$(echo "$full_type" | awk '{print $1}')
+          
+          # Extrai o tipo base (removendo parênteses e seu conteúdo)
+          base_type=$(echo "$type_definition" | sed -E 's/\([^)]*\)//g')
+          
+          # Inicializa variáveis
+          swagger_format=""
+          enum_values=""
+          
+          # Determina o tipo Swagger baseado no tipo do banco
+          case $base_type in
+              int|tinyint|smallint|mediumint|bigint)
+                  swagger_type="integer"
+                  ;;
+              integer)
+                  swagger_type="integer"
+                  ;;
+              float|double|decimal|numeric)
+                  swagger_type="number"
+                  ;;
+              enum)
+                  swagger_type="string"
+                  # Extrai os valores do ENUM - método alternativo
+                  # Pega tudo que está entre parênteses: ( 'M','A','T' )
+                  enum_content=$(echo "$type_definition" | grep -o '\((.*)\)' | sed -e "s/[()]//g")
+                  # Remove as aspas simples e converte em lista
+                  enum_values=$(echo "$enum_content" | sed -e "s/'//g" -e "s/,/ /g")
+                  ;;
+              date)
+                  swagger_type="string"
+                  swagger_format="date"
+                  ;;
+              datetime|timestamp)
+                  swagger_type="string"
+                  swagger_format="date-time"
+                  ;;
+              time)
+                  swagger_type="string"
+                  swagger_format="time"
+                  ;;
+              year)
+                  swagger_type="string"
+                  swagger_format="year"
+                  ;;
+              text|tinytext|mediumtext|longtext|varchar|char)
+                  swagger_type="string"
+                  ;;
+              boolean|bool|bit)
+                  swagger_type="boolean"
+                  ;;
+              json)
+                  swagger_type="object"
+                  ;;
+              *)
+                  swagger_type="string"
+                  ;;
+          esac
+          
+          # Escreve no formato YAML
+          echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}$field:" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+          echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}type: $swagger_type" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+          
+          # Adiciona format se existir
+          if [ ! -z "$swagger_format" ]; then
+              echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}format: $swagger_format" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+          fi
+          
+          # Se for ENUM, adiciona a lista de valores possíveis
+          if [ "$base_type" = "enum" ] && [ ! -z "$enum_values" ]; then
+              echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}enum:" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+              # Converte a lista de valores para o formato YAML
+              for value in $enum_values; do
+                  echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}  - \"$value\"" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+              done
+          fi
+          
+          # Detecta se o campo permite NULL
+          is_nullable=$(echo "$line" | awk '{print $4}')
+          if [ "$is_nullable" = "YES" ]; then
+              nullable="true"
+          else
+              nullable="false"
+          fi
+          echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}nullable: $nullable" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+          echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+          
+      done < "/tmp/adicli/$pid/debug_raw.txt"
       
-      # Determina o tipo Swagger
-      case $type in
-        int|tinyint|smallint|mediumint|bigint|integer)
-          swagger_type="integer"
-          ;;
-        float|double|decimal)
-          swagger_type="number"
-          ;;
-        enum)
-          swagger_type="string"
-          # Para enum, precisaríamos extrair os valores, mas isso é complexo
-          # Vamos deixar como string por enquanto
-          ;;
-        date)
-          swagger_type="string"
-          swagger_format="date"
-          ;;
-        datetime|timestamp)
-          swagger_type="string"
-          swagger_format="date-time"
-          ;;
-        time)
-          swagger_type="string"
-          swagger_format="time"
-          ;;
-        year)
-          swagger_type="string"
-          swagger_format="year"
-          ;;
-        text|tinytext|mediumtext|longtext|varchar|char)
-          swagger_type="string"
-          ;;
-        boolean|bool)
-          swagger_type="boolean"
-          ;;
-        *)
-          swagger_type="string"
-          ;;
-      esac
+      cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+  }
+
+  # SWAGGER_FIELDS_YAML_DATA
+  # ==============================================================================
+  function SWAGGER_FIELDS_YAML_DATA() {
+      echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_DATA.txt"
       
-      # Verifica se o campo permite nulo (isso requereria info adicional)
-      # Por enquanto, vamos assumir nullable: false como padrão
+      while IFS= read -r line; do
+          echo "$line" | grep -E -q '^($|CONSTRAINT)' && continue
+          
+          field=$(echo "$line" | awk '{print $1}')
+          full_type=$(echo "$line" | awk '{$1=""; print $0}' | sed -e 's/^[ \t]*//')
+          type_definition=$(echo "$full_type" | awk '{print $1}')
+          base_type=$(echo "$type_definition" | sed -E 's/\([^)]*\)//g')
+          
+          case $base_type in
+              int|tinyint|smallint|mediumint|bigint|integer)
+                  example="12"
+                  ;;
+              float|double|decimal|numeric)
+                  example="12.34"
+                  ;;
+              boolean|bool|bit)
+                  example="true"
+                  ;;
+              date)
+                  example='\"2024-01-31\"'
+                  ;;
+              datetime|timestamp)
+                  example='\"2024-01-31 14:30:00\"'
+                  ;;
+              time)
+                  example='\"14:30:00\"'
+                  ;;
+              year)
+                  example='\"2024\"'
+                  ;;
+              enum)
+                  # Para ENUM, pega o primeiro valor como exemplo
+                  enum_content=$(echo "$type_definition" | grep -o '\((.*)\)' | sed -e "s/[()]//g")
+                  first_enum=$(echo "$enum_content" | sed -e "s/'//g" -e "s/,/ /g" | awk '{print $1}')
+                  if [ ! -z "$first_enum" ]; then
+                      example="\"$first_enum\""
+                  else
+                      example='\"\"'
+                  fi
+                  ;;
+              char|varchar|text|tinytext|mediumtext|longtext)
+                  example='\"Example text\"'
+                  ;;
+              json)
+                  example='{\"key\": \"value\"}'
+                  ;;
+              *)
+                  example='\"Some value\"'
+                  ;;
+          esac
+          
+          echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_DATA.txt"
+          
+      done < "/tmp/adicli/$pid/debug_raw.txt"
       
-      # Escreve no formato YAML
-      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}$field:"                           >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}type: $swagger_type"          >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-      
-      # Adiciona format se existir
-      if [ ! -z "$swagger_format" ]; then
-        echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}format: $swagger_format"    >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-        unset swagger_format
-      fi
-      
-      # Adiciona nullable: false como padrão
-      echo "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}nullable: false"              >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-      echo ""                                                               >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
-    done
-    
-    # Restaura o comando original
-    db_command="$original_db_command"
-    
-    # Retorna o conteúdo
-    cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML.txt"
+      echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_DATA.txt"
+      cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_DATA.txt"
   }
 
   # SWAGGER_FIELDS_YAML_EXAMPLE
   # ==============================================================================
   function SWAGGER_FIELDS_YAML_EXAMPLE() {
-    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
-    
-    first=true
-    
-    echo "$db_command" | $db_connector | grep -E -v '^($|CONSTRAINT)' | sed -e 's/|/ /g' | awk '{print $1}' | while read field; do
+      echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
       
-      # Determina um exemplo baseado no nome do campo
-      case $field in
-        *id|*cod*|*num*)
-          example="12"
-          ;;
-        *nome*|*desc*|*titulo*|*texto*)
-          example='\"Some value\"'
-          ;;
-        *data*|*date*)
-          example='\"2021-10-12\"'
-          ;;
-        *hora*|*time*)
-          example='\"13:44\"'
-          ;;
-        *datetime*|*timestamp*)
-          example='\"2021-10-12 13:44\"'
-          ;;
-        *bool*|*flag*|*ativo*|*status*)
-          example="true"
-          ;;
-        *sim*|*nao*|*concluida*)
-          example="'S'"
-          ;;
-        *)
-          example='\"Some value\"'
-          ;;
-      esac
+      local first=true
       
-      # Se não for o primeiro campo, adiciona vírgula no final da linha anterior
-      if [ "$first" = true ]; then
-        first=false
-        echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example"  >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
-      else
-        echo -n ",{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
-      fi
-    done
-    
-    # Adiciona uma quebra de linha no final
-    echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
-    
-    cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+      while IFS= read -r line; do
+          echo "$line" | grep -E -q '^($|CONSTRAINT)' && continue
+          
+          field=$(echo "$line" | awk '{print $1}')
+          full_type=$(echo "$line" | awk '{$1=""; print $0}' | sed -e 's/^[ \t]*//')
+          type_definition=$(echo "$full_type" | awk '{print $1}')
+          base_type=$(echo "$type_definition" | sed -E 's/\([^)]*\)//g')
+          
+          case $base_type in
+              int|tinyint|smallint|mediumint|bigint|integer)
+                  example="12"
+                  ;;
+              float|double|decimal|numeric)
+                  example="12.34"
+                  ;;
+              boolean|bool|bit)
+                  example="true"
+                  ;;
+              date)
+                  example='\"2024-01-31\"'
+                  ;;
+              datetime|timestamp)
+                  example='\"2024-01-31 14:30:00\"'
+                  ;;
+              time)
+                  example='\"14:30:00\"'
+                  ;;
+              year)
+                  example='\"2024\"'
+                  ;;
+              enum)
+                  # Para ENUM, pega o primeiro valor como exemplo
+                  enum_content=$(echo "$type_definition" | grep -o '\((.*)\)' | sed -e "s/[()]//g")
+                  first_enum=$(echo "$enum_content" | sed -e "s/'//g" -e "s/,/ /g" | awk '{print $1}')
+                  if [ ! -z "$first_enum" ]; then
+                      example="\"$first_enum\""
+                  else
+                      example='\"\"'
+                  fi
+                  ;;
+              char|varchar|text|tinytext|mediumtext|longtext)
+                  example='\"Example text\"'
+                  ;;
+              json)
+                  example='{\"key\": \"value\"}'
+                  ;;
+              *)
+                  example='\"Some value\"'
+                  ;;
+          esac
+          
+          if [ "$first" = true ]; then
+              echo -n "{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+              first=false
+          else
+              echo -n ",{NEWLINE}{TAB}{TAB}{TAB}{TAB}{TAB}{TAB}\"$field\": $example" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+          fi
+          
+      done < "/tmp/adicli/$pid/debug_raw.txt"
+      
+      echo "" >>"/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
+      cat "/tmp/adicli/$pid/SWAGGER_FIELDS_YAML_EXAMPLE.txt"
   }
 
   # SWAGGER_FIELDS_YAML_REQUIRED
@@ -400,6 +563,7 @@ function generate() {
     s|##SESSION_FILTERS##|$(echo -n $(SESSION_FILTERS))|g;
     s|##LIST_COLUMNS##|$(echo -n $(LIST_COLUMNS))|g;
     s|##SWAGGER_FIELDS_YAML##|$(echo -n $(SWAGGER_FIELDS_YAML))|g;
+    s|##SWAGGER_FIELDS_YAML_DATA##|$(echo -n $(SWAGGER_FIELDS_YAML_DATA))|g;
     s|##SWAGGER_FIELDS_YAML_EXAMPLE##|$(echo -n $(SWAGGER_FIELDS_YAML_EXAMPLE))|g;
     s|##SWAGGER_FIELDS_YAML_REQUIRED##|$(echo -n $(SWAGGER_FIELDS_YAML_REQUIRED))|g;
     s|<your name here>|${AUTHOR}|g;
@@ -573,4 +737,4 @@ esac
 
 # Clean files
 # ==============================================================================
-rm -rf "/tmp/adicli/$pid"
+# rm -rf "/tmp/adicli/$pid"
