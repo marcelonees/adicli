@@ -1,7 +1,10 @@
 <?php
 
 use Adianti\Database\TRecord;
-
+use Adianti\Database\TTransaction;
+use Adianti\Registry\TSession;
+use Adianti\Model\SystemUser;
+use Exception;
 /**
  * {CLASS} Active Record
  * @author <your name here>
@@ -64,7 +67,7 @@ class {CLASS} extends TRecord
      public function onBeforeStore($object)
      {
          $object->system_user_id = TSession::getValue('userid');
-         $object->login  	 = TSession::getValue('login');
+         $object->login  	     = TSession::getValue('login');
 
          /**
           * Verifica se o documento foi enviado via sistema ou via API REST
