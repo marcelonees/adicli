@@ -3,8 +3,7 @@
 use Adianti\Database\TRecord;
 use Adianti\Database\TTransaction;
 use Adianti\Registry\TSession;
-use Adianti\Model\SystemUser;
-use Exception;
+
 /**
  * {CLASS} Active Record
  * @author <your name here>
