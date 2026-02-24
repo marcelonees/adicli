@@ -8,61 +8,61 @@
 
 case $db_engine in
 
-  #
-  # PostgreSQL
-  #
-  "postgres")
-    export PGPASSWORD="$db_password"
-    db_command="\d $db_table"
+    #
+    # PostgreSQL
+    #
+    "postgres")
+        export PGPASSWORD="$db_password"
+        db_command="\d $db_table"
 
-    if [ "X$db_table" != "X" ] ; then
-      db_connector="psql -h $db_host -p $db_port -d $db -U $db_admin -w"
-      PRIMARY_KEY=$(echo "$db_command"|$db_connector -a |grep -i 'PRIMARY KEY'|awk '{print $5}'|sed -e 's/(//g; s/)//g; s/,.*//g')
-      PRIMARYKEY=$PRIMARY_KEY
-    fi
+        if [ "X$db_table" != "X" ] ; then
+            db_connector="psql -h $db_host -p $db_port -d $db -U $db_admin -w"
+            PRIMARY_KEY=$(echo "$db_command"|$db_connector -a |grep -i 'PRIMARY KEY'|awk '{print $5}'|sed -e 's/(//g; s/)//g; s/,.*//g')
+            PRIMARYKEY=$PRIMARY_KEY
+        fi
 
-    db_connector="psql -h $db_host -p $db_port -d $db -U $db_admin -w -t"
-    show_tables="\dt"
-    ;;
+        db_connector="psql -h $db_host -p $db_port -d $db -U $db_admin -w -t"
+        show_tables="\dt"
+        ;;
 
-  #
-  # MySQL
-  #
-  "mysql")
-    db_command="desc $db_table;"
-    db_connector="mysql -s -h $db_host -P $db_port -u $db_admin -p$db_password $db"
+    #
+    # MySQL
+    #
+    "mysql")
+        db_command="desc $db_table;"
+        db_connector="mysql -s -h $db_host -P $db_port -u $db_admin -p$db_password $db"
 
-    if [ "X$db_table" != "X" ] ; then
-      PRIMARY_KEY=$(echo "SHOW KEYS FROM $db_table WHERE Key_name = 'PRIMARY';"|$db_connector|grep -i PRIMARY|awk '{print $5}')
-      PRIMARYKEY=$PRIMARY_KEY
-    fi
+        if [ "X$db_table" != "X" ] ; then
+            PRIMARY_KEY=$(echo "SHOW KEYS FROM $db_table WHERE Key_name = 'PRIMARY';"|$db_connector|grep -i PRIMARY|awk '{print $5}')
+            PRIMARYKEY=$PRIMARY_KEY
+        fi
 
-    show_tables="show tables;"
-    ;;
+        show_tables="show tables;"
+        ;;
 
-  #
-  # Firebird
-  #
-  "firebird")
-    db_command="show table $db_table;"
-    db_connector="isql-fb -u $db_admin -p $db_password $db_host/$db_port:$db"
+    #
+    # Firebird
+    #
+    "firebird")
+        db_command="show table $db_table;"
+        db_connector="isql-fb -u $db_admin -p $db_password $db_host/$db_port:$db"
 
-    if [ "X$db_table" != "X" ] ; then
-      PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g; s/,.*//g')
-      PRIMARYKEY=$PRIMARY_KEY
-    fi
+        if [ "X$db_table" != "X" ] ; then
+            PRIMARY_KEY=$(echo "$db_command"|$db_connector|grep -i "^  Primary key "|awk '{print $3}'|sed -e 's/(//g; s/)//g; s/,.*//g')
+            PRIMARYKEY=$PRIMARY_KEY
+        fi
 
-    show_tables="show tables;"
-    ;;
+        show_tables="show tables;"
+        ;;
 
-  #
-  # Invalid or Unknown database
-  #
-  *)
-    echo "$0: Error - Invalid or Unknown database"
-    usage
-    exit 255
-    ;;
+    #
+    # Invalid or Unknown database
+    #
+    *)
+        echo "$0: Error - Invalid or Unknown database"
+        usage
+        exit 255
+        ;;
 
 esac
 

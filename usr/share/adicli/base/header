@@ -9,9 +9,9 @@
 # Usage
 #
 usage() {
-  echo
-  echo "Use: $0 -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]"
-  echo
+    echo
+    echo "Use: $0 -c database.conf -t Table -T Template -M Model -C ClassName [-O tables|templates|examples]"
+    echo
 }
 
 test() {
@@ -46,51 +46,51 @@ EOF
 # Command Line Options
 #
 while getopts :S:M:A:P:c:C:t:T:O: opt "${MY_OWN_SET[@]}"; do
-  case $opt in
-    S)
-      STRATEGY=$OPTARG
-      ;;
-    M)
-      MODEL=$OPTARG
-      ;;      
-    A)
-      AUTHOR=$OPTARG
-      ;;
-    P)
-      PARENT_CLASS=$OPTARG
-      ;;
-    c)
-      conf_file=$OPTARG
-      ;;
-    T)
-      TEMPLATE=$OPTARG
-      ;;
-    C)
-      CLASS=$OPTARG
-      ;;
-    O)
-      option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
-      case $option in
-        "tables"|"templates"|"examples")
-        ;;
-        *)
-          echo "$0: Error - Invalid option ($OPTARG)"
-          exit 3
-        ;;
-      esac
-      ;;
-    t)
-      db_table="$OPTARG"
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 2
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
+    case $opt in
+      S)
+          STRATEGY=$OPTARG
+          ;;
+      M)
+          MODEL=$OPTARG
+          ;;      
+      A)
+          AUTHOR=$OPTARG
+          ;;
+      P)
+          PARENT_CLASS=$OPTARG
+          ;;
+      c)
+          conf_file=$OPTARG
+          ;;
+      T)
+          TEMPLATE=$OPTARG
+          ;;
+      C)
+          CLASS=$OPTARG
+          ;;
+      O)
+          option=$(echo "$OPTARG"|tr '[:upper:]' '[:lower:]')
+          case $option in
+                  "tables"|"templates"|"examples")
+                  ;;
+              *)
+                  echo "$0: Error - Invalid option ($OPTARG)"
+                  exit 3
+              ;;
+          esac
+          ;;
+      t)
+          db_table="$OPTARG"
+          ;;
+      \?)
+          echo "Invalid option: -$OPTARG" >&2
+          exit 2
+          ;;
+      :)
+          echo "Option -$OPTARG requires an argument." >&2
+          exit 1
+          ;;
+    esac
 
 done
 
@@ -99,8 +99,8 @@ done
 # ==============================================================================
 if [ "X$1" == "X" ] ; then
 
-  usage
-  exit
+    usage
+    exit
 
 fi
 
@@ -108,39 +108,39 @@ fi
 # ==============================================================================
 if [ "X$option" != "X" ] ; then
 
-  echo
+    echo
 
 else
 
-  if [ -z "$conf_file" ] || [ ! -f "$conf_file" ]; then
+    if [ -z "$conf_file" ] || [ ! -f "$conf_file" ]; then
 
-    echo "$0: Error - Invalid database config file"
-    #exit 2
+        echo "$0: Error - Invalid database config file"
+        #exit 2
 
-  else
+    else
 
-    source "$conf_file"
+        source "$conf_file"
 
-  fi
+    fi
 
-  #
-  # Verifica se todos os parametros foram passados
-  #
-  if  [ -z "$db" ]            || \
-      [ -z "$db_host" ]       || \
-      [ -z "$db_engine" ]     || \
-      [ -z "$db_port" ]       || \
-      [ -z "$db_admin" ]      || \
-      [ -z "$db_password" ]   || \
-      [ -z "$db_table" ]      || \
-      [ -z "$MODEL" ]         || \
-      [ -z "$TEMPLATE" ]      || \
-      [ -z "$CLASS" ] ; then
+    #
+    # Verifica se todos os parametros foram passados
+    #
+    if  [ -z "$db" ]            || \
+        [ -z "$db_host" ]       || \
+        [ -z "$db_engine" ]     || \
+        [ -z "$db_port" ]       || \
+        [ -z "$db_admin" ]      || \
+        [ -z "$db_password" ]   || \
+        [ -z "$db_table" ]      || \
+        [ -z "$MODEL" ]         || \
+        [ -z "$TEMPLATE" ]      || \
+        [ -z "$CLASS" ] ; then
 
-    usage
-    exit
+        usage
+        exit
 
-  fi
+    fi
 
 fi
 
