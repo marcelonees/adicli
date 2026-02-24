@@ -20,5 +20,5 @@
     "commandCenter.border": "#15202b99"
   },
   "peacock.color": "#61dafb",
-  "cSpell.words": ["nullable"]
+  "cSpell.words": ["bigserial", "nullable", "smallint"]
 }
